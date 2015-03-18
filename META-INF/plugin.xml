@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.phraseapp.androidstudio</id>
     <name>PhraseApp</name>
-    <version>1.0</version>
+    <version>1.1</version>
     <vendor email="support@phraseapp.com" url="https://www.phraseapp.com">PhraseApp</vendor>
 
     <description><![CDATA[
@@ -9,6 +9,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      Version 1.1<br/>
+      <em>- merge improvements from rocklive</em>
+      <em>- fix OSX compatibility issue</em>
+      <em>- fix JRE 1.6 compatibility issue</em>
       Version 1.0<br/>
       <em>- Initial release for Android Studio</em>
     ]]>
