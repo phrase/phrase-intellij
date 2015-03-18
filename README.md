@@ -8,6 +8,16 @@ PhraseApp helps you manage Translations in your Android Studio projects. Read mo
 
 ## Download and Installation
 
-In Android Studio, head to *File -> Settings -> Plugins -> PhraseApp -> Install* 
+**Windows/Linux**
+In Android Studio, head to *File -> Settings -> Plugins* 
 
-Manual Installation: [download the Plugin](https://plugins.jetbrains.com/plugin/7686?pr=androidstudio) from JetBrains Plugin site, then install it via *File -> Settings -> Plugins -> Install from hard dirve* 
+**OSX**
+In Android Studio, go to *Android Studio* -> Preferences... -> Plugins*
+
+--
+
+Download the **PhraseApp** plugin from the repository browser or [manualy download PhraseApp.zip](https://plugins.jetbrains.com/plugin/7686?pr=androidstudio) from the JetBrains Plugin site. 
+
+Install via "Plugins -> Install Plugin from disk... -> PhraseApp.zip*
+ 
+

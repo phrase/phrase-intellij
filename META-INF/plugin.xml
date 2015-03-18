@@ -1,45 +1,46 @@
 <idea-plugin version="2">
-  <id>com.phraseapp.androidstudio</id>
-  <name>PhraseApp</name>
-  <version>1.0</version>
-  <vendor email="support@phraseapp.com" url="https://www.phraseapp.com">PhraseApp</vendor>
+    <id>com.phraseapp.androidstudio</id>
+    <name>PhraseApp</name>
+    <version>1.0</version>
+    <vendor email="support@phraseapp.com" url="https://www.phraseapp.com">PhraseApp</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
       PhraseApp helps you manage Translations in your Android Studio projects.
     ]]></description>
 
-  <change-notes><![CDATA[
+    <change-notes><![CDATA[
       Version 1.0<br/>
       <em>- Initial release for Android Studio</em>
     ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="131"/>
-
-
-  <depends>com.intellij.modules.lang</depends>
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="131"/>
 
 
-  <extensions defaultExtensionNs="com.intellij">
+    <depends>com.intellij.modules.lang</depends>
+
+
+    <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="com.phraseapp.androidstudio.PhraseAppConfigurable"></applicationConfigurable>
-  </extensions>
+    </extensions>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
 
-  <actions>
-      <group id="PhraseApp.PhraseAppMenu" text="PhraseApp" description="PhraseApp">
-          <add-to-group group-id="MainMenu" anchor="last"  />
-          <action id="com.phraseapp.androidstudio.PhraseAppDownload" class="com.phraseapp.androidstudio.DownloadButton" text="Download Locales" description="Download Locales from PhraseApp" />
-          <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.UploadButton" text="Upload Locales" description="Upload Locales to PhraseApp" />
-          <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.WebButton" text="PhraseApp Translation Center" description="Open the PhraseApp Translation Center in your browser" />
-      </group>
-  </actions>
+    <actions>
+        <group id="PhraseApp.PhraseAppMenu" text="PhraseApp" description="PhraseApp">
+            <add-to-group group-id="MainMenu" anchor="last"  />
+            <action id="com.phraseapp.androidstudio.PhraseAppDownload" class="com.phraseapp.androidstudio.DownloadButton" text="Download Locales" description="Download Locales from PhraseApp" />
+            <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.UploadButton" text="Upload Locales" description="Upload Locales to PhraseApp" />
+            <!-- <action id="com.phraseapp.androidstudio.ForcePhraseAppUpload" class="com.phraseapp.androidstudio.ForceUploadButton" text="Force Upload" description="Upload Locales to PhraseApp and ignore current state" /> -->
+            <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.WebButton" text="PhraseApp Translation Center" description="Open the PhraseApp Translation Center in your browser" />
+         </group>
+     </actions>
 
-</idea-plugin>
+ </idea-plugin>
