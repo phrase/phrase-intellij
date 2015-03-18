@@ -9,9 +9,11 @@ PhraseApp helps you manage Translations in your Android Studio projects. Read mo
 ## Download and Installation
 
 **Windows/Linux**
+
 In Android Studio, head to *File -> Settings -> Plugins* 
 
 **OSX**
+
 In Android Studio, go to *Android Studio* -> Preferences... -> Plugins*
 
 --
