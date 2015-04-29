@@ -27,7 +27,7 @@ public class API {
     }
 
     public static final String PHRASE_API_BASEURL = "https://phraseapp.com/api/v1/";
-    public static final String PHRASE_USER_AGENT = "PhraseApp Android Studio Plugin";
+    public static final String PHRASE_USER_AGENT = "PhraseApp AndroidStudio v1.3";
 
 
     /**

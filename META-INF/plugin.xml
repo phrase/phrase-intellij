@@ -9,10 +9,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      Version 1.2<br/>
+      <em>- fix UserAgent</em><br/>
       Version 1.1<br/>
-      <em>- merge improvements from rocklive</em>
-      <em>- fix OSX compatibility issue</em>
-      <em>- fix JRE 1.6 compatibility issue</em>
+      <em>- merge improvements from rocklive</em><br/>
+      <em>- fix OSX compatibility issue</em><br/>
+      <em>- fix JRE 1.6 compatibility issue</em><br/>
       Version 1.0<br/>
       <em>- Initial release for Android Studio</em>
     ]]>
