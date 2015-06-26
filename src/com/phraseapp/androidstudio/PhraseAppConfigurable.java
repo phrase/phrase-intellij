@@ -1,8 +1,8 @@
 package com.phraseapp.androidstudio;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.HeaderTokenizer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +12,8 @@ import java.awt.*;
 
 public class PhraseAppConfigurable implements Configurable {
     private JComponent settingsUI;
-    private JTextField authTokenField;
+    private JTextField accessTokenField;
+    private JTextField projectIdField;
 
     @Nls
     @Override
@@ -29,36 +30,43 @@ public class PhraseAppConfigurable implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        authTokenField = new JTextField(50);
-        authTokenField.setText(TokenRepository.getInstance().getToken());
-        authTokenField.setPreferredSize(new Dimension(200, 20));
+        accessTokenField = new JTextField(64);
+        accessTokenField.setText(TokenRepository.getInstance().getAccessToken());
+        accessTokenField.setSize(new Dimension(120, 20));
+        JLabel accessTokenLabel = new JLabel();
+        accessTokenLabel.setText("PhraseApp Access Token");
 
-        JLabel authTokenLabel = new JLabel();
-        authTokenLabel.setText("PhraseApp Project Auth Token");
+        projectIdField = new JTextField(32);
+        projectIdField.setText(TokenRepository.getInstance().getProjectId());
+        projectIdField.setSize(new Dimension(120, 20));
+        JLabel projectIdLabel = new JLabel();
+        projectIdLabel.setText("PhraseApp Project ID");
 
         settingsUI = new JPanel();
-        settingsUI.setPreferredSize(new Dimension(400, 600));
-        settingsUI.add(authTokenLabel);
-        settingsUI.add(authTokenField);
+        settingsUI.setPreferredSize(new Dimension(600, 400));
+        settingsUI.add(accessTokenLabel);
+        settingsUI.add(accessTokenField);
+        settingsUI.add(projectIdLabel);
+        settingsUI.add(projectIdField);
 
         return settingsUI;
     }
 
     @Override
     public boolean isModified() {
-        String text = authTokenField.getText();
-        String token = TokenRepository.getInstance().getToken();
-        return text == null ? token != null : !text.trim().equals(token);
+        return true;
     }
 
     @Override
     public void apply() throws ConfigurationException {
-        TokenRepository.getInstance().setToken(authTokenField.getText().trim());
+        TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
+        TokenRepository.getInstance().setProjectId(projectIdField.getText().trim());
     }
 
     @Override
     public void reset() {
-        authTokenField.setText(TokenRepository.getInstance().getToken());
+        accessTokenField.setText(TokenRepository.getInstance().getAccessToken());
+        projectIdField.setText(TokenRepository.getInstance().getProjectId());
     }
 
     @Override

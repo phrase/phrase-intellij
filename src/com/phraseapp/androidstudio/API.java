@@ -1,20 +1,15 @@
 package com.phraseapp.androidstudio;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.apache.commons.io.*;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-
-import static org.apache.commons.httpclient.params.HttpMethodParams.COOKIE_POLICY;
-
 
 public class API {
 
@@ -26,116 +21,104 @@ public class API {
         return Holder.HOLDER_INSTANCE;
     }
 
-    public static final String PHRASE_API_BASEURL = "https://phraseapp.com/api/v1/";
-    public static final String PHRASE_USER_AGENT = "PhraseApp AndroidStudio v1.3";
+    public static final String PHRASEAPP_API_BASEURL = "https://api.phraseapp.com/v2/";
+    public static final String PHRASEAPP_USER_AGENT = "PhraseApp AndroidStudio 2.0";
 
 
-    /**
-     * HttpClient for all requests
-     *
-     * @return
-     */
-    private HttpClient apiClient() {
-        HttpClient client = new HttpClient();
-        client.getParams().setParameter(COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
-        client.getParams().setParameter(HttpMethodParams.USER_AGENT, PHRASE_USER_AGENT);
+
+    public Unirest buildClient(){
+        Unirest client = new Unirest();
+        client.setDefaultHeader("Authorization", "token " + TokenRepository.getInstance().getAccessToken());
+        client.setDefaultHeader("User-Agent", PHRASEAPP_USER_AGENT);
         return client;
     }
 
 
-    /**
-     * Helper for Get Requests
-     *
-     * @return NV-Pair with auth_token
-     */
-    private NameValuePair[] addAuthToken() {
-        return (new NameValuePair[]{
-                new NameValuePair("auth_token", TokenRepository.getInstance().getToken())}
-        );
-    }
-
-
-    /**
-     * Download a locale file (.xml) from PhraseApp
-     *
-     * @param localecode Target-locale
-     * @return contents of locale file as UTF-8 string
-     */
-    public String downloadLocaleFile(String localecode) {
-        GetMethod method = new GetMethod(PHRASE_API_BASEURL + "locales/" + localecode + ".xml");
-        method.setQueryString(addAuthToken());
+    // Find LocaleID for given localeName
+    public String findLocaleId(String localeName){
+        HttpResponse<JsonNode> rsp = null;
         try {
-            int status = apiClient().executeMethod(method);
-            if (status == 200) {
-                return method.getResponseBodyAsString();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-    /**
-     * Upload a locale file to PhraseApp
-     *
-     * @param locale  Target-locale
-     * @param content Content of file to upload
-     * @param forceUpload
-     * @return success true/false
-     */
-    public boolean uploadLocaleFile(String locale, String content, boolean forceUpload) {
-        PostMethod method = new PostMethod(PHRASE_API_BASEURL + "file_imports");
-        method.getParams().setContentCharset("UTF-8");
-        method.setParameter("auth_token", TokenRepository.getInstance().getToken());
-        method.setParameter("file_import[locale_code]", locale);
-        if (forceUpload) {
-            method.setParameter("file_import[update_translations]", "1");
-        }
-        method.setParameter("file_import[format]", "xml");
-        method.setParameter("file_import[filename]", "strings.xml");
-        method.setParameter("file_import[file_content]", content);
-
-        try {
-            int status = apiClient().executeMethod(method);
-            if (status == 200 && method.getResponseBodyAsString().contains("\"success\":true")) {
-                return true;
-            } else {
-                System.out.println(method.getResponseBodyAsString());
-                return false;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-
-    /**
-     * Get all available locales from PhraseApp
-     *
-     * @return List with locales
-     */
-    public LinkedList<String> getLocales() {
-        GetMethod method = new GetMethod(PHRASE_API_BASEURL + "locales");
-        method.setQueryString(addAuthToken());
-
-        LinkedList<String> locales = new LinkedList<String>();
-
-        try {
-            apiClient().executeMethod(method);
-            Object obj = JSONValue.parse(method.getResponseBodyAsString());
-            JSONArray array = (JSONArray) obj;
-            for (int i = 0; i < array.size(); i++) {
-                JSONObject obj2 = (JSONObject) array.get(i);
-                locales.add((String) obj2.get("code"));
-            }
-        } catch (IOException e) {
+            rsp = buildClient().get(PHRASEAPP_API_BASEURL + "projects/" + TokenRepository.getInstance().getProjectId() + "/locales")
+                    .asJson();
+        } catch (UnirestException e) {
             e.printStackTrace();
         }
-        return locales;
+
+        JSONArray locales = rsp.getBody().getArray();
+        for(int i = 0; i < locales.length(); i++){
+            JSONObject loc = (JSONObject)locales.get(i);
+            if(loc.get("name").toString().equals(localeName)){
+                return loc.get("id").toString();
+            }
+        }
+        return "";
     }
 
+
+    // Get all locales
+    public LinkedList<String> getLocales(){
+        HttpResponse<JsonNode> rsp = null;
+        try {
+            rsp = buildClient().get(PHRASEAPP_API_BASEURL + "projects/" + TokenRepository.getInstance().getProjectId() + "/locales")
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        LinkedList<String> localeList = new LinkedList<String>();
+
+        JSONArray locales = rsp.getBody().getArray();
+        for(int i = 0; i < locales.length(); i++){
+            JSONObject loc = (JSONObject)locales.get(i);
+            localeList.add(loc.get("name").toString());
+        }
+
+        return localeList;
+    }
+
+
+    // Create a locale
+    public void createLocale(String name, String code){
+        try {
+            HttpResponse<JsonNode>rsp = buildClient().post(PHRASEAPP_API_BASEURL + "projects/" + TokenRepository.getInstance().getProjectId() + "/locales")
+                    .field("name", name)
+                    .field("code", code)
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public boolean uploadLocale(String filePath, String localeName){
+       createLocale(localeName, localeName);
+
+       HttpResponse rsp = null;
+        try {
+            rsp = buildClient().post(PHRASEAPP_API_BASEURL + "projects/" + TokenRepository.getInstance().getProjectId() + "/uploads")
+                    .field("locale_id", findLocaleId(localeName))
+                    .field("format", "xml")
+                    .field("update_translations", true)
+                    .field("file", new File(filePath))
+                    .asString();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return rsp.getStatus() == 201;
+
+    }
+
+
+    public String downloadLocale(String localeName){
+        HttpResponse rsp = null;
+        try {
+            rsp = buildClient().get(PHRASEAPP_API_BASEURL + "projects/" + TokenRepository.getInstance().getProjectId() + "/locales/" + findLocaleId(localeName) + "/download")
+                    .queryString("file_format", "xml")
+                    .asString();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return rsp.getBody().toString();
+    }
 }

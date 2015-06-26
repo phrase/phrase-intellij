@@ -19,13 +19,13 @@ public class WebButton extends AnAction {
         if (Desktop.isDesktopSupported()) {
             try {
                 Desktop.getDesktop().browse(new URI("https://phraseapp.com/projects"));
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } catch (URISyntaxException e1) {
-                e1.printStackTrace();
+            } catch (IOException exc) {
+                exc.printStackTrace();
+            } catch (URISyntaxException exc) {
+                exc.printStackTrace();
             }
         } else {
-            Notifications.Bus.notify(new Notification("Phrase App", "Error", "Could not locate browser, please head to https://phraseapp.com/", NotificationType.ERROR));
+            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Could not locate browser, please head to https://phraseapp.com/", NotificationType.ERROR));
         }
 
     }
