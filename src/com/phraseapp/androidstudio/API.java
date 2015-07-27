@@ -91,7 +91,8 @@ public class API {
 
 
     public boolean uploadLocale(String filePath, String localeName){
-       createLocale(localeName, localeName);
+        String localeCode =  localeName.replace("-r", "-"); // this is to prevent invalid PhraseApp localeIDs like de-rCH, pl-rPL
+        createLocale(localeName, localeCode);
 
        HttpResponse rsp = null;
         try {
