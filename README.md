@@ -1,6 +1,6 @@
-# Phrase-AndroidStudio
+# PhraseApp-AndroidStudio
 
-Phrase-AndroidStudio is a Plugin for Android Studio, the official Android IDE from Google. 
+PhraseApp-AndroidStudio is a Plugin for Android Studio, the official Android IDE from Google. 
 
 ### PhraseApp
 
