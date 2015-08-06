@@ -18,30 +18,38 @@ import java.util.LinkedList;
 public class DownloadButton extends AnAction {
 
     public void actionPerformed(final AnActionEvent e) {
-        LinkedList<String> locales = API.getInstance().getLocales();
-        final VirtualFile resDirectory = PhraseAppCommon.findResDirectory(e.getProject().getBaseDir());
-        int numLocales = locales.size();
-        int downloadErrors = 0;
 
-        for(String localeName : locales){
-            File localeFile = new File("");
-            if (localeName.equals("en")) {
-                localeFile = new File(resDirectory.getPath() + "/values/strings.xml");
-            } else {
-                localeFile = new File(resDirectory.getPath() + "/values-" + localeName + "/strings.xml");
-            }
-            try {
-                FileUtils.writeStringToFile(localeFile, API.getInstance().downloadLocale(localeName), "UTF-8");
-            } catch (IOException e1) {
-                downloadErrors++;
-            }
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LinkedList<String> locales = API.getInstance().getLocales();
+                final VirtualFile resDirectory = PhraseAppCommon.findResDirectory(e.getProject().getBaseDir());
+                int numLocales = locales.size();
+                int downloadErrors = 0;
 
-        if (downloadErrors > 0){
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Failed to save " + downloadErrors + " locale files.", NotificationType.ERROR));
-        }else{
-            Notifications.Bus.notify(new Notification("PhraseApp", "Success", "Saved " + numLocales + " locale files.", NotificationType.INFORMATION));
-        }
+                for(String localeName : locales){
+                    File localeFile = new File("");
+                    if (localeName.equals("en")) {
+                        localeFile = new File(resDirectory.getPath() + "/values/strings.xml");
+                    } else {
+                        localeFile = new File(resDirectory.getPath() + "/values-" + localeName + "/strings.xml");
+                    }
+                    try {
+                        FileUtils.writeStringToFile(localeFile, API.getInstance().downloadLocale(localeName), "UTF-8");
+                    } catch (IOException e1) {
+                        downloadErrors++;
+                        Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Failed to download locale " + localeName + " to " + localeFile, NotificationType.ERROR));
+                    }
+                }
+
+                if (downloadErrors > 0){
+                    Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Failed to save " + downloadErrors + " locale files.", NotificationType.ERROR));
+                }else{
+                    Notifications.Bus.notify(new Notification("PhraseApp", "Success", "Saved " + numLocales + " locale files.", NotificationType.INFORMATION));
+                }
+            }
+        }).start();
+
 
     }
 }

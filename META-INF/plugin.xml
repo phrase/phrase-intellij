@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.phraseapp.androidstudio</id>
     <name>PhraseApp</name>
-    <version>2.1</version>
+    <version>2.2</version>
     <vendor email="support@phraseapp.com" url="https://www.phraseapp.com">PhraseApp</vendor>
 
     <description><![CDATA[
@@ -9,18 +9,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      Version 2.2<br/>
+      <em>- improves performance, adds more detailed error handling</em><br/>
       Version 2.1<br/>
       <em>- fixes a problem when Android-style locale-culture codes (e.g. "pl-rPL") are used</em><br/>
       Version 2.0<br/>
       <em>- support for PhraseApp API v2</em><br/>
-      Version 1.2<br/>
-      <em>- fix UserAgent</em><br/>
-      Version 1.1<br/>
-      <em>- merge improvements from rocklive</em><br/>
-      <em>- fix OSX compatibility issue</em><br/>
-      <em>- fix JRE 1.6 compatibility issue</em><br/>
-      Version 1.0<br/>
-      <em>- Initial release for Android Studio</em>
     ]]>
     </change-notes>
 

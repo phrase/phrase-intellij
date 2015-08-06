@@ -27,30 +27,38 @@ public class UploadButton extends AnAction {
 
 
     public void actionPerformed(final AnActionEvent e) {
-        final VirtualFile resDirectory = PhraseAppCommon.findResDirectory(e.getProject().getBaseDir());
-        LinkedList<String> projectLocales = PhraseAppCommon.findProjectLocales(resDirectory);
-        int numLocales = projectLocales.size();
 
-        int uploadErrors = 0;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final VirtualFile resDirectory = PhraseAppCommon.findResDirectory(e.getProject().getBaseDir());
+                LinkedList<String> projectLocales = PhraseAppCommon.findProjectLocales(resDirectory);
+                int numLocales = projectLocales.size();
 
-        for(String localeName : projectLocales){
-            String localeFile = "";
-            if (localeName.equals("en")) {
-                localeFile = resDirectory.getPath() + "/values/strings.xml";
-            } else {
-                localeFile = resDirectory.getPath() + "/values-" + localeName + "/strings.xml";
+                int uploadErrors = 0;
+
+                for(String localeName : projectLocales){
+                    String localeFile = "";
+                    if (localeName.equals("en")) {
+                        localeFile = resDirectory.getPath() + "/values/strings.xml";
+                    } else {
+                        localeFile = resDirectory.getPath() + "/values-" + localeName + "/strings.xml";
+                    }
+
+                    if(!API.getInstance().uploadLocale(localeFile, localeName)){
+                        uploadErrors++;
+                        Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Failed to upload locale " + localeName + " at " + localeFile, NotificationType.ERROR));
+                    }
+                }
+
+                if (uploadErrors > 0){
+                    Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Failed to upload " + uploadErrors + " locale files.", NotificationType.ERROR));
+                }else{
+                    Notifications.Bus.notify(new Notification("PhraseApp", "Success", "Uploaded " + numLocales + " locale files.", NotificationType.INFORMATION));
+                }
             }
+        }).start();
 
-            if(!API.getInstance().uploadLocale(localeFile, localeName)){
-                uploadErrors++;
-            }
-        }
-
-        if (uploadErrors > 0){
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Failed to upload " + uploadErrors + " locale files.", NotificationType.ERROR));
-        }else{
-            Notifications.Bus.notify(new Notification("PhraseApp", "Success", "Uploaded " + numLocales + " locale files.", NotificationType.INFORMATION));
-        }
 
     }
 
