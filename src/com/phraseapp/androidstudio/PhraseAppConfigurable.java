@@ -1,8 +1,14 @@
 package com.phraseapp.androidstudio;
 
+import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.StatusBar;
+import com.intellij.openapi.wm.WindowManager;
+import com.intellij.ide.util.PropertiesComponent;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.HeaderTokenizer;
+import org.jdesktop.swingx.JXErrorPane;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +65,9 @@ public class PhraseAppConfigurable implements Configurable {
 
     @Override
     public void apply() throws ConfigurationException {
+        if(accessTokenField.getText().length() > 20 && accessTokenField.getText().length() < 40){
+            JOptionPane.showMessageDialog(settingsUI, "This looks like a APIv1 token. Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
+        }
         TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
         TokenRepository.getInstance().setProjectId(projectIdField.getText().trim());
     }
