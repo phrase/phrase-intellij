@@ -20,6 +20,7 @@ public class PhraseAppConfigurable implements Configurable {
     private JComponent settingsUI;
     private JTextField accessTokenField;
     private JTextField projectIdField;
+    private JCheckBox updateTranslationsCheckbox;
 
     @Nls
     @Override
@@ -48,12 +49,16 @@ public class PhraseAppConfigurable implements Configurable {
         JLabel projectIdLabel = new JLabel();
         projectIdLabel.setText("PhraseApp Project ID");
 
+        updateTranslationsCheckbox = new JCheckBox("Update Translations");
+        updateTranslationsCheckbox.setSelected(TokenRepository.getInstance().getUpdateTranslations());
+
         settingsUI = new JPanel();
         settingsUI.setPreferredSize(new Dimension(600, 400));
         settingsUI.add(accessTokenLabel);
         settingsUI.add(accessTokenField);
         settingsUI.add(projectIdLabel);
         settingsUI.add(projectIdField);
+        settingsUI.add(updateTranslationsCheckbox);
 
         return settingsUI;
     }
@@ -70,6 +75,7 @@ public class PhraseAppConfigurable implements Configurable {
         }
         TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
         TokenRepository.getInstance().setProjectId(projectIdField.getText().trim());
+        TokenRepository.getInstance().setUpdateTranslations(updateTranslationsCheckbox.isSelected());
     }
 
     @Override

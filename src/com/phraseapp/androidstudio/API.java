@@ -3,6 +3,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.HeaderTokenizer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.io.*;
@@ -97,10 +98,11 @@ public class API {
 
        HttpResponse rsp = null;
         try {
+            boolean update = TokenRepository.getInstance().getUpdateTranslations();
             rsp = buildClient().post(PHRASEAPP_API_BASEURL + "projects/" + TokenRepository.getInstance().getProjectId() + "/uploads")
                     .field("locale_id", findLocaleId(localeName))
                     .field("format", "xml")
-                    .field("update_translations", true)
+                    .field("update_translations", update)
                     .field("file", new File(filePath))
                     .asString();
         } catch (UnirestException e) {

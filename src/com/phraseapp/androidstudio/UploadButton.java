@@ -56,6 +56,9 @@ public class UploadButton extends AnAction {
                 }else{
                     Notifications.Bus.notify(new Notification("PhraseApp", "Success", "Uploaded " + numLocales + " locale files.", NotificationType.INFORMATION));
                 }
+
+                PhraseAppCommon.writeCLIconfig(e.getProject().getBaseDir());
+
             }
         }).start();
 

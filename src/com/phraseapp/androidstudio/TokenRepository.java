@@ -5,7 +5,7 @@ import com.intellij.ide.util.PropertiesComponent;
 public class TokenRepository {
     public static final String PHRASEAPP_ACCESS_TOKEN = "PHRASEAPP_ACCESS_TOKEN";
     public static final String PHRASEAPP_PROJECT_ID = "PHRASEAPP_PROJECT_ID";
-
+    public static final String PHRASEAPP_UPDATE_TRANSLATIONS = "PHRASEAPP_UPDATE_TRANSLATIONS";
 
     public static class Holder {
         public static final TokenRepository HOLDER_INSTANCE = new TokenRepository();
@@ -30,6 +30,16 @@ public class TokenRepository {
     public void setProjectId(String projectId) {
         PropertiesComponent.getInstance().setValue(PHRASEAPP_PROJECT_ID, projectId);
     }
+
+    public boolean getUpdateTranslations() {
+        return PropertiesComponent.getInstance().getBoolean(PHRASEAPP_UPDATE_TRANSLATIONS, false);
+    }
+
+    public void setUpdateTranslations(boolean update) {
+        PropertiesComponent.getInstance().setValue(PHRASEAPP_UPDATE_TRANSLATIONS, Boolean.toString(update));
+    }
+
+
 }
 
 

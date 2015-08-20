@@ -5,7 +5,10 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.vfs.VFileProperty;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class PhraseAppCommon {
@@ -72,6 +75,61 @@ public class PhraseAppCommon {
         return file.getPath().contains("res/values") && file.getName().equals("strings.xml")
                 && !file.getPath().contains("res/values-zz")
                 && !file.getPath().contains("res/values-id");
+    }
+
+
+    /**
+     * Write PhraseApp .yml config for CLI tool
+     *
+     * @param projectDir Project Directory
+     * @return void
+     */
+    protected static void writeCLIconfig(VirtualFile projectDir){
+        LinkedList<String> locales = API.getInstance().getLocales();
+        VirtualFile resDir = findResDirectory(projectDir);
+        String config = "phraseapp:\n"
+                + "  access_token: \"" + TokenRepository.getInstance().getAccessToken() + "\"\n"
+                + "  project_id: \"" + TokenRepository.getInstance().getProjectId() + "\"\n"
+                + "  file_format: \"xml\"\n"
+                + "  push:\n"
+                + "    sources:\n";
+        for (String localeName : locales){
+            if(localeName.equals("en")){
+                config = config +
+                        "      - file: " + resDir.getPath() + "/values/strings.xml\n" +
+                        "        params:\n" +
+                        "          locale_id: en\n";
+            }else{
+                config = config +
+                        "      - file: " + resDir.getPath() + "/values-" + localeName + "/strings.xml\n" +
+                        "        params:\n" +
+                        "          locale_id: " + localeName + "\n";
+            }
+        }
+        config = config +
+                "  pull:\n"
+                + "    targets:\n";
+        for (String localeName : locales) {
+            if (localeName.equals("en")){
+                config = config +
+                        "      - file: " + resDir.getPath() + "/values/strings.xml\n" +
+                        "        params:\n" +
+                        "          locale_id: en\n";
+            }else{
+                config = config +
+                        "      - file: " + resDir.getPath() + "/values-" + localeName + "/strings.xml\n" +
+                        "        params:\n" +
+                        "          locale_id: " + localeName + "\n";
+            }
+        }
+
+        try {
+            File configFile = new File(projectDir.getPath() + "/.phraseapp.yml");
+            System.out.println(configFile);
+            FileUtils.writeStringToFile(configFile, config);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
