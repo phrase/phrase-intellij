@@ -22,7 +22,7 @@ public class API {
         return Holder.HOLDER_INSTANCE;
     }
 
-    public static final String PHRASEAPP_VERSION = "2.2";
+    public static final String PHRASEAPP_VERSION = "2.3";
     public static final String PHRASEAPP_API_BASEURL = "https://api.phraseapp.com/v2/";
     public static final String PHRASEAPP_USER_AGENT = "PhraseApp AndroidStudio " + PHRASEAPP_VERSION;
 
