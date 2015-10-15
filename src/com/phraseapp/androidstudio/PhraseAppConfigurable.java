@@ -70,6 +70,7 @@ public class PhraseAppConfigurable implements Configurable {
         final JPanel settingsUI = new JPanel(new GridBagLayout());
         GridBagConstraints cs = new GridBagConstraints();
         cs.fill = GridBagConstraints.HORIZONTAL;
+        cs.insets = new Insets(0,0,10,0);
         cs.gridx = 0;
         cs.gridy = 0;
         cs.gridwidth = 1;
@@ -100,13 +101,19 @@ public class PhraseAppConfigurable implements Configurable {
             initializeDynamicFields();
 
             JScrollPane localesScrollPane = new JScrollPane(defaultLocaleSelect);
+            localesScrollPane.setPreferredSize(new Dimension(120, 60));
             JScrollPane projectsScrollPane = new JScrollPane(projectSelect);
+            projectsScrollPane.setPreferredSize(new Dimension(120, 60));
+
 
             JLabel projectIdLabel = new JLabel();
             projectIdLabel.setText("PhraseApp Project");
 
             JLabel accessTokenLabel = new JLabel();
             accessTokenLabel.setText("PhraseApp Access Token");
+
+            JLabel accessTokenHint = new JLabel();
+            accessTokenHint.setText("Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
 
             JLabel defaultLocaleLabel = new JLabel();
             defaultLocaleLabel.setText("Default locale");
@@ -127,7 +134,6 @@ public class PhraseAppConfigurable implements Configurable {
             updateTranslationsCheckbox.setSelected(TokenRepository.getInstance().getUpdateTranslations());
 
             JTextArea generateConfigLabel = new JTextArea();
-            generateConfigLabel.setSize(new Dimension(120, 20));
             generateConfigLabel.setEditable(false);
             generateConfigLabel.setOpaque(false);
             generateConfigLabel.setText("A .phareapp.yml will be generated with your settings. The .phraseapp.yml will be added to your projects root folder and be editable.\nSee here for more information: http://docs.phraseapp.com/developers/cli/configuration/");
@@ -141,40 +147,45 @@ public class PhraseAppConfigurable implements Configurable {
             cs.gridwidth = 2;
             settingsUI.add(accessTokenField, cs);
 
-            cs.gridx = 0;
+            cs.gridx = 1;
             cs.gridy = 2;
+            cs.gridwidth = 2;
+            settingsUI.add(accessTokenHint, cs);
+
+            cs.gridx = 0;
+            cs.gridy = 3;
             cs.gridwidth = 1;
             settingsUI.add(projectIdLabel, cs);
             cs.gridx = 1;
-            cs.gridy = 2;
+            cs.gridy = 3;
             cs.gridwidth = 2;
             settingsUI.add(projectsScrollPane, cs);
 
             cs.gridx = 0;
-            cs.gridy = 3;
+            cs.gridy = 4;
             cs.gridwidth = 1;
             settingsUI.add(defaultLocaleLabel, cs);
             cs.gridx = 1;
-            cs.gridy = 3;
+            cs.gridy = 4;
             cs.gridwidth = 2;
             settingsUI.add(localesScrollPane, cs);
 
             cs.gridx = 0;
-            cs.gridy = 4;
+            cs.gridy = 5;
             cs.gridwidth = 1;
             settingsUI.add(defaultStringsPathLabel, cs);
             cs.gridx = 1;
-            cs.gridy = 4;
+            cs.gridy = 5;
             cs.gridwidth = 2;
             settingsUI.add(defaultStringsPathField, cs);
 
             cs.gridx = 1;
-            cs.gridy = 5;
+            cs.gridy = 6;
             cs.gridwidth = 2;
             settingsUI.add(updateTranslationsCheckbox, cs);
 
             cs.gridx = 1;
-            cs.gridy = 6;
+            cs.gridy = 7;
             cs.gridwidth = 2;
             settingsUI.add(generateConfigLabel, cs);
         }
@@ -184,7 +195,6 @@ public class PhraseAppConfigurable implements Configurable {
 
     private void initializeDynamicFields() {
         accessTokenField = new JTextField(64);
-        accessTokenField.setSize(new Dimension(120, 20));
         accessTokenField.setText(TokenRepository.getInstance().getAccessToken());
 
         projectSelect = new JList(projects);
