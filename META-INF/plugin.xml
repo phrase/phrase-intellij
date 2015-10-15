@@ -29,6 +29,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="com.phraseapp.androidstudio.PhraseAppConfigurable"></applicationConfigurable>
+        <toolWindow id="PhraseApp" anchor="right" factoryClass="com.phraseapp.androidstudio.PhraseToolWindow"></toolWindow>
     </extensions>
 
     <application-components>
@@ -44,7 +45,6 @@
             <add-to-group group-id="MainMenu" anchor="last"  />
             <action id="com.phraseapp.androidstudio.PhraseAppDownload" class="com.phraseapp.androidstudio.DownloadButton" text="Download Locales" description="Download Locales from PhraseApp" />
             <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.UploadButton" text="Upload Locales" description="Upload Locales to PhraseApp" />
-            <!-- <action id="com.phraseapp.androidstudio.ForcePhraseAppUpload" class="com.phraseapp.androidstudio.ForceUploadButton" text="Force Upload" description="Upload Locales to PhraseApp and ignore current state" /> -->
             <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.WebButton" text="PhraseApp Translation Center" description="Open the PhraseApp Translation Center in your browser" />
          </group>
      </actions>
