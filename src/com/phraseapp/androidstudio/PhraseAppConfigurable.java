@@ -13,7 +13,13 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,10 +30,14 @@ public class PhraseAppConfigurable implements Configurable {
     private TextFieldWithBrowseButton clientPathField;
     private JTextArea configField;
     private JTextField accessTokenField;
-    private JTextField projectIdField;
+    private JList projectSelect;
     private JCheckBox updateTranslationsCheckbox;
     private TextFieldWithBrowseButton defaultStringsPathField;
-    private JTextField defaultLocaleField;
+    private JList defaultLocaleSelect;
+    private ResourceListModel projects = new ResourceListModel();
+    private ResourceListModel locales = new ResourceListModel();
+    private String projectId = "";
+    private String localeId = "";
 
     @Nls
     @Override
@@ -45,30 +55,29 @@ public class PhraseAppConfigurable implements Configurable {
     @Override
     public JComponent createComponent() {
         clientPathField = new TextFieldWithBrowseButton();
-        final FileChooserDescriptor fileChooserDescriptor=new FileChooserDescriptor(true,false,false,false,false,false){
-            public boolean isFileSelectable(VirtualFile file){
+        final FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false) {
+            public boolean isFileSelectable(VirtualFile file) {
                 return file.getName().startsWith("phraseapp");
             }
         };
 
-        clientPathField.addBrowseFolderListener("Choose PhraseApp Client","Test",null,fileChooserDescriptor);
+        clientPathField.addBrowseFolderListener("Choose PhraseApp Client", "Test", null, fileChooserDescriptor);
         clientPathField.setText(TokenRepository.getInstance().getClientPath());
         JLabel clientPathLabel = new JLabel();
         clientPathLabel.setText("PhraseApp Client Path");
 
 
-
-        JPanel settingsUI = new JPanel(new GridBagLayout());
+        final JPanel settingsUI = new JPanel(new GridBagLayout());
         GridBagConstraints cs = new GridBagConstraints();
         cs.fill = GridBagConstraints.HORIZONTAL;
         cs.gridx = 0;
         cs.gridy = 0;
         cs.gridwidth = 1;
-        settingsUI.add(clientPathLabel,cs);
+        settingsUI.add(clientPathLabel, cs);
         cs.gridx = 1;
         cs.gridy = 0;
         cs.gridwidth = 2;
-        settingsUI.add(clientPathField,cs);
+        settingsUI.add(clientPathField, cs);
 
         String config = TokenRepository.getInstance().loadPhraseAppConfig();
 
@@ -88,9 +97,23 @@ public class PhraseAppConfigurable implements Configurable {
             cs.gridwidth = 2;
             settingsUI.add(configField, cs);
         } else {
+            initializeDynamicFields();
+
+            JScrollPane localesScrollPane = new JScrollPane(defaultLocaleSelect);
+            JScrollPane projectsScrollPane = new JScrollPane(projectSelect);
+
+            JLabel projectIdLabel = new JLabel();
+            projectIdLabel.setText("PhraseApp Project");
+
+            JLabel accessTokenLabel = new JLabel();
+            accessTokenLabel.setText("PhraseApp Access Token");
+
+            JLabel defaultLocaleLabel = new JLabel();
+            defaultLocaleLabel.setText("Default locale");
+
             defaultStringsPathField = new TextFieldWithBrowseButton();
-            final FileChooserDescriptor localeFileChooserDesc = new FileChooserDescriptor(true,false,false,false,false,false){
-                public boolean isFileSelectable(VirtualFile file){
+            final FileChooserDescriptor localeFileChooserDesc = new FileChooserDescriptor(true, false, false, false, false, false) {
+                public boolean isFileSelectable(VirtualFile file) {
                     return file.getName().startsWith("strings");
                 }
             };
@@ -99,24 +122,6 @@ public class PhraseAppConfigurable implements Configurable {
             defaultStringsPathField.setText(TokenRepository.getInstance().getDefaultStringsPath());
             JLabel defaultStringsPathLabel = new JLabel();
             defaultStringsPathLabel.setText("Default strings");
-
-            accessTokenField = new JTextField(64);
-            accessTokenField.setSize(new Dimension(120, 20));
-            accessTokenField.setText(TokenRepository.getInstance().getAccessToken());
-            JLabel accessTokenLabel = new JLabel();
-            accessTokenLabel.setText("PhraseApp Access Token");
-
-            projectIdField = new JTextField(32);
-            projectIdField.setSize(new Dimension(120, 20));
-            projectIdField.setText(TokenRepository.getInstance().getProjectId());
-            JLabel projectIdLabel = new JLabel();
-            projectIdLabel.setText("PhraseApp Project ID");
-
-            defaultLocaleField = new JTextField(32);
-            defaultLocaleField.setSize(new Dimension(120, 20));
-            defaultLocaleField.setText(TokenRepository.getInstance().getDefaultLocale());
-            JLabel defaultLocaleLabel = new JLabel();
-            defaultLocaleLabel.setText("Default locale");
 
             updateTranslationsCheckbox = new JCheckBox("Update Translations");
             updateTranslationsCheckbox.setSelected(TokenRepository.getInstance().getUpdateTranslations());
@@ -143,7 +148,7 @@ public class PhraseAppConfigurable implements Configurable {
             cs.gridx = 1;
             cs.gridy = 2;
             cs.gridwidth = 2;
-            settingsUI.add(projectIdField, cs);
+            settingsUI.add(projectsScrollPane, cs);
 
             cs.gridx = 0;
             cs.gridy = 3;
@@ -152,7 +157,7 @@ public class PhraseAppConfigurable implements Configurable {
             cs.gridx = 1;
             cs.gridy = 3;
             cs.gridwidth = 2;
-            settingsUI.add(defaultLocaleField, cs);
+            settingsUI.add(localesScrollPane, cs);
 
             cs.gridx = 0;
             cs.gridy = 4;
@@ -177,6 +182,107 @@ public class PhraseAppConfigurable implements Configurable {
         return settingsUI;
     }
 
+    private void initializeDynamicFields() {
+        accessTokenField = new JTextField(64);
+        accessTokenField.setSize(new Dimension(120, 20));
+        accessTokenField.setText(TokenRepository.getInstance().getAccessToken());
+
+        projectSelect = new JList(projects);
+        projectSelect.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        projectSelect.setSelectedIndex(0);
+
+        defaultLocaleSelect = new JList(locales);
+        defaultLocaleSelect.setEnabled(false);
+        defaultLocaleSelect.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        defaultLocaleSelect.setSelectedIndex(0);
+
+        if (accessTokenField.getText().isEmpty()) {
+            projectSelect.setEnabled(false);
+        } else {
+            API api = new API(accessTokenField.getText().trim());
+            projects = api.getProjects();
+            projectSelect.setModel(projects);
+            projectSelect.setEnabled(true);
+        }
+
+        accessTokenField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkToken();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkToken();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+            }
+
+            private void checkToken() {
+                if (accessTokenField.getText().length() == 64) {
+                    updateProjectSelect();
+                } else {
+                    resetProjectSelect();
+                }
+            }
+        });
+
+        projectSelect.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false) {
+
+                    if (projectSelect.getSelectedIndex() == -1) {
+                        //No selection, disable fire button.
+                        defaultLocaleSelect.setEnabled(false);
+
+                    } else {
+                        //Selection, enable the fire button.
+                        API api = new API(accessTokenField.getText().trim());
+                        PhraseResource project = projects.getModelAt(
+                                projectSelect.getSelectedIndex());
+                        projectId = project.getId();
+
+                        if (!projectId.isEmpty()) {
+                            locales = api.getLocales(projectId);
+                            defaultLocaleSelect.setModel(locales);
+                            defaultLocaleSelect.setEnabled(true);
+                        }
+                    }
+                }
+            }
+        });
+
+        defaultLocaleSelect.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                PhraseResource locale = locales.getModelAt(
+                        defaultLocaleSelect.getSelectedIndex());
+                localeId = locale.getId();
+            }
+        });
+    }
+
+    private void resetProjectSelect() {
+        projects = new ResourceListModel();
+        projectSelect.setModel(projects);
+    }
+
+    private void updateProjectSelect() {
+        API api = new API(accessTokenField.getText().trim());
+        projects = api.getProjects();
+
+        if (projects != null) {
+            projectSelect.setModel(projects);
+            projectSelect.setEnabled(true);
+        } else {
+            projectSelect.setEnabled(false);
+            JOptionPane.showMessageDialog(settingsUI, "The access_token is not valid. Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
+        }
+    }
+
     @Override
     public boolean isModified() {
         return true;
@@ -184,7 +290,7 @@ public class PhraseAppConfigurable implements Configurable {
 
     @Override
     public void apply() throws ConfigurationException {
-        if(clientPathField.getText().isEmpty()){
+        if (clientPathField.getText().isEmpty()) {
             JOptionPane.showMessageDialog(settingsUI, "Please select the phraseapp client");
             return;
         }
@@ -192,29 +298,18 @@ public class PhraseAppConfigurable implements Configurable {
         TokenRepository.getInstance().setClientPath(clientPathField.getText().trim());
         if (configField != null) {
             TokenRepository.getInstance().setConfig(configField.getText().trim());
-        }else{
-            if(defaultStringsPathField.getText().isEmpty()){
-                JOptionPane.showMessageDialog(settingsUI, "Please select the default locale");
-                return;
-            }
-
-            if(accessTokenField.getText().isEmpty() || projectIdField.getText().isEmpty()){
-                JOptionPane.showMessageDialog(settingsUI, "Please make sure to provide a PhraseApp project_id and access_token");
-                return;
-            }
-
-            if(accessTokenField.getText().length() > 20 && accessTokenField.getText().length() < 40){
-                JOptionPane.showMessageDialog(settingsUI, "This looks like a APIv1 token. Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
+        } else {
+            if (accessTokenField.getText().isEmpty() || projectId.isEmpty() || localeId.isEmpty()) {
+                JOptionPane.showMessageDialog(settingsUI, "Please make sure to enter a PhraseApp access_token, select a project and default locale.");
                 return;
             }
 
             TokenRepository.getInstance().generateConfig(getConfigMap());
             TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
-            TokenRepository.getInstance().setProjectId(projectIdField.getText().trim());
+            TokenRepository.getInstance().setProjectId(projectId);
             TokenRepository.getInstance().setDefaultStringsPath(defaultStringsPathField.getText().trim());
             TokenRepository.getInstance().setUpdateTranslations(updateTranslationsCheckbox.isSelected());
-            TokenRepository.getInstance().setDefaultLocale(defaultLocaleField.getText().trim());
-
+            TokenRepository.getInstance().setDefaultLocale(localeId);
         }
     }
 
@@ -242,7 +337,7 @@ public class PhraseAppConfigurable implements Configurable {
         Map<String, String> pushParams = new HashMap<String, String>();
 
 
-        if (updateTranslationsCheckbox.isSelected()){
+        if (updateTranslationsCheckbox.isSelected()) {
             pullParams.put("update_translations", true);
             pullFile.put("params", pullParams);
         }
@@ -258,7 +353,7 @@ public class PhraseAppConfigurable implements Configurable {
 
         root.put("push", push);
         root.put("pull", pull);
-        root.put("project_id", projectIdField.getText().trim());
+        root.put("project_id", projectId);
         root.put("access_token", accessTokenField.getText().trim());
         root.put("file_format", "xml");
 
@@ -266,7 +361,7 @@ public class PhraseAppConfigurable implements Configurable {
         return base;
     }
 
-    private String getPushPath(){
+    private String getPushPath() {
         DataContext dataContext = DataManager.getInstance().getDataContext();
         Project project = (Project) dataContext.getData(DataConstants.PROJECT);
         String path = defaultStringsPathField.getText().trim();
@@ -277,5 +372,4 @@ public class PhraseAppConfigurable implements Configurable {
     private String getPullPath(String defaultLocalePath) {
         return defaultLocalePath.replaceAll("values", "values-<locale_name>");
     }
-
 }
