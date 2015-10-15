@@ -64,10 +64,6 @@ public class PhraseAppConfigurable implements Configurable {
         };
 
         clientPathField.addBrowseFolderListener("Choose PhraseApp Client", "Test", null, fileChooserDescriptor);
-        /**/
-        System.out.println("CLIENT PATH IN TOKENREPO: " + TokenRepository.getInstance().getClientPath());
-        System.out.println("DETECTED: " + ClientDetection.findClientInstallation());
-        /**/
         if(TokenRepository.getInstance().getClientPath() == null){
             String detected = ClientDetection.findClientInstallation();
             if (detected != null){
@@ -92,10 +88,7 @@ public class PhraseAppConfigurable implements Configurable {
         cs.gridy = 0;
         cs.gridwidth = 2;
         settingsUI.add(clientPathField, cs);
-
-
-        // Client Detection
-
+        
         String config = TokenRepository.getInstance().loadPhraseAppConfig();
 
         if (config.startsWith("phraseapp")) {
