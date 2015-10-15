@@ -342,7 +342,7 @@ public class PhraseAppConfigurable implements Configurable {
             pullFile.put("params", pullParams);
         }
 
-        pushParams.put("locale_id", "en");
+        pushParams.put("locale_id", localeId);
         pushFile.put("params", pushParams);
         String defaultLocalePath = getPushPath();
         pushFile.put("file", defaultLocalePath);
