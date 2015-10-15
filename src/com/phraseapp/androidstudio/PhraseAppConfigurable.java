@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -27,7 +26,8 @@ public class PhraseAppConfigurable implements Configurable {
     private JTextField accessTokenField;
     private JTextField projectIdField;
     private JCheckBox updateTranslationsCheckbox;
-    private TextFieldWithBrowseButton defaultLocalePathField;
+    private TextFieldWithBrowseButton defaultStringsPathField;
+    private JTextField defaultLocaleField;
 
     @Nls
     @Override
@@ -88,17 +88,17 @@ public class PhraseAppConfigurable implements Configurable {
             cs.gridwidth = 2;
             settingsUI.add(configField, cs);
         } else {
-            defaultLocalePathField = new TextFieldWithBrowseButton();
+            defaultStringsPathField = new TextFieldWithBrowseButton();
             final FileChooserDescriptor localeFileChooserDesc = new FileChooserDescriptor(true,false,false,false,false,false){
                 public boolean isFileSelectable(VirtualFile file){
                     return file.getName().startsWith("strings");
                 }
             };
 
-            defaultLocalePathField.addBrowseFolderListener("Choose default locale","Test",null,localeFileChooserDesc);
-            defaultLocalePathField.setText(TokenRepository.getInstance().getDefaultLocalePath());
-            JLabel defaultLocalePathLabel = new JLabel();
-            defaultLocalePathLabel.setText("Default locale");
+            defaultStringsPathField.addBrowseFolderListener("Choose default locale", "Test", null, localeFileChooserDesc);
+            defaultStringsPathField.setText(TokenRepository.getInstance().getDefaultStringsPath());
+            JLabel defaultStringsPathLabel = new JLabel();
+            defaultStringsPathLabel.setText("Default strings");
 
             accessTokenField = new JTextField(64);
             accessTokenField.setSize(new Dimension(120, 20));
@@ -111,6 +111,12 @@ public class PhraseAppConfigurable implements Configurable {
             projectIdField.setText(TokenRepository.getInstance().getProjectId());
             JLabel projectIdLabel = new JLabel();
             projectIdLabel.setText("PhraseApp Project ID");
+
+            defaultLocaleField = new JTextField(32);
+            defaultLocaleField.setSize(new Dimension(120, 20));
+            defaultLocaleField.setText(TokenRepository.getInstance().getDefaultLocale());
+            JLabel defaultLocaleLabel = new JLabel();
+            defaultLocaleLabel.setText("Default locale");
 
             updateTranslationsCheckbox = new JCheckBox("Update Translations");
             updateTranslationsCheckbox.setSelected(TokenRepository.getInstance().getUpdateTranslations());
@@ -139,21 +145,31 @@ public class PhraseAppConfigurable implements Configurable {
             cs.gridwidth = 2;
             settingsUI.add(projectIdField, cs);
 
+            cs.gridx = 0;
+            cs.gridy = 3;
+            cs.gridwidth = 1;
+            settingsUI.add(defaultLocaleLabel, cs);
             cs.gridx = 1;
             cs.gridy = 3;
             cs.gridwidth = 2;
-            settingsUI.add(updateTranslationsCheckbox, cs);
+            settingsUI.add(defaultLocaleField, cs);
 
             cs.gridx = 0;
             cs.gridy = 4;
             cs.gridwidth = 1;
-            settingsUI.add(defaultLocalePathLabel, cs);
+            settingsUI.add(defaultStringsPathLabel, cs);
             cs.gridx = 1;
             cs.gridy = 4;
             cs.gridwidth = 2;
-            settingsUI.add(defaultLocalePathField, cs);
+            settingsUI.add(defaultStringsPathField, cs);
+
             cs.gridx = 1;
             cs.gridy = 5;
+            cs.gridwidth = 2;
+            settingsUI.add(updateTranslationsCheckbox, cs);
+
+            cs.gridx = 1;
+            cs.gridy = 6;
             cs.gridwidth = 2;
             settingsUI.add(generateConfigLabel, cs);
         }
@@ -177,7 +193,7 @@ public class PhraseAppConfigurable implements Configurable {
         if (configField != null) {
             TokenRepository.getInstance().setConfig(configField.getText().trim());
         }else{
-            if(defaultLocalePathField.getText().isEmpty()){
+            if(defaultStringsPathField.getText().isEmpty()){
                 JOptionPane.showMessageDialog(settingsUI, "Please select the default locale");
                 return;
             }
@@ -195,8 +211,10 @@ public class PhraseAppConfigurable implements Configurable {
             TokenRepository.getInstance().generateConfig(getConfigMap());
             TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
             TokenRepository.getInstance().setProjectId(projectIdField.getText().trim());
-            TokenRepository.getInstance().setDefaultLocalePath(defaultLocalePathField.getText().trim());
+            TokenRepository.getInstance().setDefaultStringsPath(defaultStringsPathField.getText().trim());
             TokenRepository.getInstance().setUpdateTranslations(updateTranslationsCheckbox.isSelected());
+            TokenRepository.getInstance().setDefaultLocale(defaultLocaleField.getText().trim());
+
         }
     }
 
@@ -251,7 +269,7 @@ public class PhraseAppConfigurable implements Configurable {
     private String getPushPath(){
         DataContext dataContext = DataManager.getInstance().getDataContext();
         Project project = (Project) dataContext.getData(DataConstants.PROJECT);
-        String path = defaultLocalePathField.getText().trim();
+        String path = defaultStringsPathField.getText().trim();
         String[] parts = path.split(project.getName());
         return "." + parts[1];
     }

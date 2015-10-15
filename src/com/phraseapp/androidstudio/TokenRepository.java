@@ -19,7 +19,9 @@ public class TokenRepository {
     public static final String PHRASEAPP_ACCESS_TOKEN = "PHRASEAPP_ACCESS_TOKEN";
     public static final String PHRASEAPP_PROJECT_ID = "PHRASEAPP_PROJECT_ID";
     public static final String PHRASEAPP_UPDATE_TRANSLATIONS = "PHRASEAPP_UPDATE_TRANSLATIONS";
+    public static final String PHRASEAPP_DEFAULT_STRINGS_PATH = "DEFAULT_STRINGS_PATH";
     public static final String PHRASEAPP_DEFAULT_LOCALE_PATH = "DEFAULT_LOCALE_PATH";
+
 
     public static class Holder {
         public static final TokenRepository HOLDER_INSTANCE = new TokenRepository();
@@ -27,6 +29,14 @@ public class TokenRepository {
 
     public static TokenRepository getInstance() {
         return Holder.HOLDER_INSTANCE;
+    }
+
+    public String getDefaultLocale() {
+        return PropertiesComponent.getInstance().getValue(PHRASEAPP_DEFAULT_LOCALE_PATH);
+    }
+
+    public void setDefaultLocale(String locale) {
+        PropertiesComponent.getInstance().setValue(PHRASEAPP_DEFAULT_LOCALE_PATH, locale);
     }
 
     public String getClientPath() {
@@ -37,12 +47,12 @@ public class TokenRepository {
         PropertiesComponent.getInstance().setValue(PHRASEAPP_CLIENT_PATH, path);
     }
 
-    public String getDefaultLocalePath() {
-        return PropertiesComponent.getInstance().getValue(PHRASEAPP_DEFAULT_LOCALE_PATH);
+    public String getDefaultStringsPath() {
+        return PropertiesComponent.getInstance().getValue(PHRASEAPP_DEFAULT_STRINGS_PATH);
     }
 
-    public void setDefaultLocalePath(String path) {
-        PropertiesComponent.getInstance().setValue(PHRASEAPP_DEFAULT_LOCALE_PATH, path);
+    public void setDefaultStringsPath(String path) {
+        PropertiesComponent.getInstance().setValue(PHRASEAPP_DEFAULT_STRINGS_PATH, path);
     }
 
     public String getAccessToken() {

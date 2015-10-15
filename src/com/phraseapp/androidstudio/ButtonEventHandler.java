@@ -21,7 +21,7 @@ public class ButtonEventHandler {
             return;
         }
 
-        if (token_repo.loadPhraseAppConfig() == null) {
+        if (!token_repo.loadPhraseAppConfig().startsWith("phraseapp")) {
             Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please create a '.phraseapp.yml' configuration file in your project root folder. You can generate a '.phraseapp.yml' configuration file in the plugin settings.", NotificationType.ERROR));
             return;
         }
