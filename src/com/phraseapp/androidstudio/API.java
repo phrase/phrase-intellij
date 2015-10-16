@@ -6,8 +6,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.LinkedList;
-
 public class API {
 
     public static final String PHRASEAPP_VERSION = "2.3";
@@ -29,7 +27,7 @@ public class API {
 
 
     // Get all locales
-    public ResourceListModel getLocales(String id){
+    public APIResourceListModel getLocales(String id){
         HttpResponse<JsonNode> rsp = null;
         try {
             rsp = buildClient().get(PHRASEAPP_API_BASEURL + "projects/" + id + "/locales")
@@ -38,12 +36,12 @@ public class API {
             e.printStackTrace();
         }
 
-        ResourceListModel localeList = new ResourceListModel();
+        APIResourceListModel localeList = new APIResourceListModel();
 
         JSONArray locales = rsp.getBody().getArray();
         for(int i = 0; i < locales.length(); i++){
             JSONObject loc = (JSONObject)locales.get(i);
-            localeList.addElement(new PhraseResource((String) loc.get("id"), (String) loc.get("name")));
+            localeList.addElement(new APIResource((String) loc.get("id"), (String) loc.get("name")));
         }
 
         return localeList;
@@ -51,7 +49,7 @@ public class API {
 
 
     // Get all projects
-    public ResourceListModel getProjects(){
+    public APIResourceListModel getProjects(){
         HttpResponse<JsonNode> rsp = null;
         try {
             rsp = buildClient().get(PHRASEAPP_API_BASEURL + "projects")
@@ -61,12 +59,12 @@ public class API {
         }
 
         if (rsp != null && rsp.getStatus() == 200) {
-            ResourceListModel projectList = new ResourceListModel();
+            APIResourceListModel projectList = new APIResourceListModel();
 
             JSONArray projects = rsp.getBody().getArray();
             for (int i = 0; i < projects.length(); i++) {
                 JSONObject pro = (JSONObject) projects.get(i);
-                projectList.addElement(new PhraseResource((String) pro.get("id"), (String) pro.get("name")));
+                projectList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
             }
 
             return projectList;

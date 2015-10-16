@@ -26,7 +26,7 @@ public class ButtonEventHandler {
             return;
         }
 
-        PhraseAppClient phraseAppClient = new PhraseAppClient(clientPath, project);
+        ClientAdapter phraseAppClient = new ClientAdapter(clientPath, project);
         phraseAppClient.run(clientAction);
     }
 }

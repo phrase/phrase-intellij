@@ -3,12 +3,12 @@ package com.phraseapp.androidstudio;
 /**
  * Created by kolja on 15.10.15.
  */
-public class PhraseResource {
+public class APIResource {
 
     private final String id;
     private final String name;
 
-    public PhraseResource(String id, String name){
+    public APIResource(String id, String name){
         this.id = id;
         this.name = name;
     }

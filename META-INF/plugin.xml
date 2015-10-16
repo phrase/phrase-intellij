@@ -30,7 +30,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="com.phraseapp.androidstudio.PhraseAppConfigurable"></applicationConfigurable>
         <toolWindow id="PhraseApp" anchor="right"
-                    factoryClass="com.phraseapp.androidstudio.PhraseToolWindow"></toolWindow>
+                    factoryClass="com.phraseapp.androidstudio.PhraseAppToolWindow"></toolWindow>
     </extensions>
 
     <application-components>

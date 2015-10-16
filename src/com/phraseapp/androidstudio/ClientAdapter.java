@@ -19,12 +19,12 @@ import java.nio.charset.Charset;
 /**
  * Created by kolja on 15.10.15.
  */
-public class PhraseAppClient {
+public class ClientAdapter {
     private String clientPath;
     private String projectPath;
     private ToolWindow outputWindow;
 
-    public PhraseAppClient(final String path, Project project){
+    public ClientAdapter(final String path, Project project){
         clientPath = path;
         projectPath = project.getBasePath();
         outputWindow = ToolWindowManager.getInstance(project).getToolWindow("PhraseApp");

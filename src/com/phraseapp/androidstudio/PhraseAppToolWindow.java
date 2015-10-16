@@ -11,7 +11,7 @@ import javax.swing.*;
 /**
  * Created by kolja on 12.10.15.
  */
-public class PhraseToolWindow implements ToolWindowFactory {
+public class PhraseAppToolWindow implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         toolWindow.setToHideOnEmptyContent(true);

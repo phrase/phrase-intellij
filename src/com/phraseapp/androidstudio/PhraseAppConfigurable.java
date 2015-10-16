@@ -31,8 +31,8 @@ public class PhraseAppConfigurable implements Configurable {
     private JCheckBox updateTranslationsCheckbox;
     private TextFieldWithBrowseButton defaultStringsPathField;
     private JList defaultLocaleSelect;
-    private ResourceListModel projects = new ResourceListModel();
-    private ResourceListModel locales = new ResourceListModel();
+    private APIResourceListModel projects = new APIResourceListModel();
+    private APIResourceListModel locales = new APIResourceListModel();
     private String projectId = "";
     private String localeId = "";
     private Boolean generateConfig = false;
@@ -250,7 +250,7 @@ public class PhraseAppConfigurable implements Configurable {
 
                     } else {
                         API api = new API(accessTokenField.getText().trim());
-                        PhraseResource project = projects.getModelAt(
+                        APIResource project = projects.getModelAt(
                                 projectSelect.getSelectedIndex());
                         projectId = project.getId();
 
@@ -267,7 +267,7 @@ public class PhraseAppConfigurable implements Configurable {
         defaultLocaleSelect.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                PhraseResource locale = locales.getModelAt(
+                APIResource locale = locales.getModelAt(
                         defaultLocaleSelect.getSelectedIndex());
                 localeId = locale.getId();
             }
@@ -275,7 +275,7 @@ public class PhraseAppConfigurable implements Configurable {
     }
 
     private void resetProjectSelect() {
-        projects = new ResourceListModel();
+        projects = new APIResourceListModel();
         projectSelect.setModel(projects);
     }
 
