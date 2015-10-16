@@ -108,7 +108,7 @@ public class ClientAdapter {
                             } else if (outputType.toString() == "system") {
                                 finalArea.append(Color.getHSBColor(0.000f, 0.000f, 0.000f), getFormattedTime() + event.getText());
                             } else {
-                                finalArea.append(Color.getHSBColor(0.000f, 1.000f, 0.502f), getFormattedTime() + event.getText());
+                                finalArea.append(Color.getHSBColor(0.000f, 1.000f, 0.502f), event.getText());
                             }
                         }
                     });

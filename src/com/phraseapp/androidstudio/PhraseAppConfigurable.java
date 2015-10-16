@@ -90,12 +90,14 @@ public class PhraseAppConfigurable implements Configurable {
 
         if (config.startsWith("phraseapp")) {
 
-            JLabel configLabel = new JLabel();
-            configLabel.setText("A .phraseap.yml configuration file has been found in your project.");
+            JTextArea configLabel = new JTextArea();
+            configLabel.setEditable(false);
+            configLabel.setOpaque(false);
+            configLabel.setText("A .phraseap.yml configuration file has been found in your project.\nLearn more: http://docs.phraseapp.com/developers/cli/configuration/");
 
-            cs.gridx = 1;
+            cs.gridx = 0;
             cs.gridy = 1;
-            cs.gridwidth = 2;
+            cs.gridwidth = 3;
             settingsUI.add(configLabel, cs);
 
         } else {
@@ -306,12 +308,12 @@ public class PhraseAppConfigurable implements Configurable {
 
         TokenRepository.getInstance().setClientPath(clientPathField.getText().trim());
 
-        if (accessTokenField.getText().isEmpty() || projectId.isEmpty() || localeId.isEmpty()) {
-            JOptionPane.showMessageDialog(settingsUI, "Please make sure to enter a PhraseApp access_token, select a project and a default locale.");
-            return;
-        }
-
         if (generateConfig) {
+            if (accessTokenField.getText().isEmpty() || projectId.isEmpty() || localeId.isEmpty()) {
+                JOptionPane.showMessageDialog(settingsUI, "Please make sure to enter a PhraseApp access_token, select a project and a default locale.");
+                return;
+            }
+
             TokenRepository.getInstance().generateConfig(getConfigMap());
             TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
             TokenRepository.getInstance().setProjectId(projectId);
