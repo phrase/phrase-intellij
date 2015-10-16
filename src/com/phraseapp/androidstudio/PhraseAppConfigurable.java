@@ -9,8 +9,10 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.HeaderTokenizer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.io.jsonRpc.Client;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -59,6 +61,13 @@ public class PhraseAppConfigurable implements Configurable {
         };
 
         clientPathField.addBrowseFolderListener("Choose PhraseApp Client", "Test", null, fileChooserDescriptor);
+        if(TokenRepository.getInstance().getClientPath() == null){
+            String detected = ClientDetection.findClientInstallation();
+            if (detected != null){
+                TokenRepository.getInstance().setClientPath(detected);
+                JOptionPane.showMessageDialog(settingsUI, "We found a PhraseApp client on your system: " + detected);
+            }
+        }
         clientPathField.setText(TokenRepository.getInstance().getClientPath());
         JLabel clientPathLabel = new JLabel();
         clientPathLabel.setText("PhraseApp Client Path");
@@ -76,7 +85,7 @@ public class PhraseAppConfigurable implements Configurable {
         cs.gridy = 0;
         cs.gridwidth = 2;
         settingsUI.add(clientPathField, cs);
-
+        
         String config = TokenRepository.getInstance().loadPhraseAppConfig();
 
         if (config.startsWith("phraseapp")) {
@@ -128,7 +137,7 @@ public class PhraseAppConfigurable implements Configurable {
             JTextArea generateConfigLabel = new JTextArea();
             generateConfigLabel.setEditable(false);
             generateConfigLabel.setOpaque(false);
-            generateConfigLabel.setText("A .phareapp.yml will be generated with your settings. The .phraseapp.yml will be added to your projects root folder and be editable.\nSee here for more information: http://docs.phraseapp.com/developers/cli/configuration/");
+            generateConfigLabel.setText("A .phraseapp.yml will be generated with your settings. The .phraseapp.yml will be added to your projects root folder and be editable.\nSee here for more information: http://docs.phraseapp.com/developers/cli/configuration/");
 
             cs.gridx = 0;
             cs.gridy = 1;
@@ -293,6 +302,7 @@ public class PhraseAppConfigurable implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         if (clientPathField.getText().isEmpty()) {
+
             JOptionPane.showMessageDialog(settingsUI, "Please select the phraseapp client");
             return;
         }
