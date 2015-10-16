@@ -9,10 +9,8 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.HeaderTokenizer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.io.jsonRpc.Client;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -37,6 +35,7 @@ public class PhraseAppConfigurable implements Configurable {
     private ResourceListModel locales = new ResourceListModel();
     private String projectId = "";
     private String localeId = "";
+    private Boolean generateConfig = false;
 
     @Nls
     @Override
@@ -59,8 +58,8 @@ public class PhraseAppConfigurable implements Configurable {
                 return file.getName().startsWith("phraseapp");
             }
         };
+        clientPathField.addBrowseFolderListener("Choose PhraseApp Client", "", null, fileChooserDescriptor);
 
-        clientPathField.addBrowseFolderListener("Choose PhraseApp Client", "Test", null, fileChooserDescriptor);
         if(TokenRepository.getInstance().getClientPath() == null){
             String detected = ClientDetection.findClientInstallation();
             if (detected != null){
@@ -68,10 +67,11 @@ public class PhraseAppConfigurable implements Configurable {
                 JOptionPane.showMessageDialog(settingsUI, "We found a PhraseApp client on your system: " + detected);
             }
         }
+
         clientPathField.setText(TokenRepository.getInstance().getClientPath());
+
         JLabel clientPathLabel = new JLabel();
         clientPathLabel.setText("PhraseApp Client Path");
-
 
         final JPanel settingsUI = new JPanel(new GridBagLayout());
         GridBagConstraints cs = new GridBagConstraints();
@@ -99,13 +99,13 @@ public class PhraseAppConfigurable implements Configurable {
             settingsUI.add(configLabel, cs);
 
         } else {
+            generateConfig = true;
             initializeDynamicFields();
 
             JScrollPane localesScrollPane = new JScrollPane(defaultLocaleSelect);
             localesScrollPane.setPreferredSize(new Dimension(120, 60));
             JScrollPane projectsScrollPane = new JScrollPane(projectSelect);
             projectsScrollPane.setPreferredSize(new Dimension(120, 60));
-
 
             JLabel projectIdLabel = new JLabel();
             projectIdLabel.setText("PhraseApp Project");
@@ -126,7 +126,7 @@ public class PhraseAppConfigurable implements Configurable {
                 }
             };
 
-            defaultStringsPathField.addBrowseFolderListener("Choose default locale", "Test", null, localeFileChooserDesc);
+            defaultStringsPathField.addBrowseFolderListener("Choose default locale", "", null, localeFileChooserDesc);
             defaultStringsPathField.setText(TokenRepository.getInstance().getDefaultStringsPath());
             JLabel defaultStringsPathLabel = new JLabel();
             defaultStringsPathLabel.setText("Default strings");
@@ -246,11 +246,9 @@ public class PhraseAppConfigurable implements Configurable {
                 if (e.getValueIsAdjusting() == false) {
 
                     if (projectSelect.getSelectedIndex() == -1) {
-                        //No selection, disable fire button.
                         defaultLocaleSelect.setEnabled(false);
 
                     } else {
-                        //Selection, enable the fire button.
                         API api = new API(accessTokenField.getText().trim());
                         PhraseResource project = projects.getModelAt(
                                 projectSelect.getSelectedIndex());
@@ -302,7 +300,6 @@ public class PhraseAppConfigurable implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         if (clientPathField.getText().isEmpty()) {
-
             JOptionPane.showMessageDialog(settingsUI, "Please select the phraseapp client");
             return;
         }
@@ -310,16 +307,18 @@ public class PhraseAppConfigurable implements Configurable {
         TokenRepository.getInstance().setClientPath(clientPathField.getText().trim());
 
         if (accessTokenField.getText().isEmpty() || projectId.isEmpty() || localeId.isEmpty()) {
-            JOptionPane.showMessageDialog(settingsUI, "Please make sure to enter a PhraseApp access_token, select a project and default locale.");
+            JOptionPane.showMessageDialog(settingsUI, "Please make sure to enter a PhraseApp access_token, select a project and a default locale.");
             return;
         }
 
-        TokenRepository.getInstance().generateConfig(getConfigMap());
-        TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
-        TokenRepository.getInstance().setProjectId(projectId);
-        TokenRepository.getInstance().setDefaultStringsPath(defaultStringsPathField.getText().trim());
-        TokenRepository.getInstance().setUpdateTranslations(updateTranslationsCheckbox.isSelected());
-        TokenRepository.getInstance().setDefaultLocale(localeId);
+        if (generateConfig) {
+            TokenRepository.getInstance().generateConfig(getConfigMap());
+            TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
+            TokenRepository.getInstance().setProjectId(projectId);
+            TokenRepository.getInstance().setDefaultStringsPath(defaultStringsPathField.getText().trim());
+            TokenRepository.getInstance().setUpdateTranslations(updateTranslationsCheckbox.isSelected());
+            TokenRepository.getInstance().setDefaultLocale(localeId);
+        }
     }
 
     @Override
