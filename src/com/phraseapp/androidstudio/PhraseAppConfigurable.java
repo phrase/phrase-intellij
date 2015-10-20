@@ -14,11 +14,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.*;
 import java.awt.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -89,15 +88,26 @@ public class PhraseAppConfigurable implements Configurable {
     private JPanel getTopPanel() {
         final JPanel infoPanel = new JPanel(new GridLayout(0,1));
 
-        JTextArea infoText = new JTextArea();
-        infoText.setLineWrap(true);
-        infoText.setWrapStyleWord(true);
+        JEditorPane infoText = new JEditorPane();
+        infoText.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
+        infoText.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent event) {
+                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    try {
+                        Desktop.getDesktop().browse(event.getURL().toURI());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    };
+                }
+            }
+        });
         infoText.setEditable(false);
         infoText.setOpaque(false);
-        Font infoTextFont = infoText.getFont();
-        Font font = new Font(infoTextFont.getFontName(), Font.BOLD, infoTextFont.getSize());
-        infoText.setFont(font);
-        infoText.setText("The PhraseApp plugin requires a installed PhraseApp client and a .phraseapp.yml configuration file.\nSee here for more information: http://docs.phraseapp.com/developers/android_studio");
+        infoText.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+        infoText.setText("<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
         infoPanel.add(infoText);
         return infoPanel;
     }
@@ -162,8 +172,27 @@ public class PhraseAppConfigurable implements Configurable {
             JLabel accessTokenLabel = new JLabel();
             accessTokenLabel.setText("PhraseApp Access Token");
 
-            JLabel accessTokenHint = new JLabel();
-            accessTokenHint.setText("Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
+
+            JEditorPane accessTokenHint = new JEditorPane();
+            accessTokenHint.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
+            accessTokenHint.addHyperlinkListener(new HyperlinkListener() {
+                @Override
+                public void hyperlinkUpdate(HyperlinkEvent event) {
+                    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        try {
+                            Desktop.getDesktop().browse(event.getURL().toURI());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        };
+                    }
+                }
+            });
+            accessTokenHint.setEditable(false);
+            accessTokenHint.setOpaque(false);
+            accessTokenHint.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+            accessTokenHint.setText("Please generate a <a href=https://phraseapp.com/settings/oauth_access_tokens>PhraseApp API Access Token</a>");
 
             JLabel defaultLocaleLabel = new JLabel();
             defaultLocaleLabel.setText("Default locale");
