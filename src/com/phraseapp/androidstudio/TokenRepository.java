@@ -31,10 +31,6 @@ public class TokenRepository {
         return Holder.HOLDER_INSTANCE;
     }
 
-    public String getDefaultLocale() {
-        return PropertiesComponent.getInstance().getValue(PHRASEAPP_DEFAULT_LOCALE_PATH);
-    }
-
     public void setDefaultLocale(String locale) {
         PropertiesComponent.getInstance().setValue(PHRASEAPP_DEFAULT_LOCALE_PATH, locale);
     }
@@ -63,10 +59,6 @@ public class TokenRepository {
         PropertiesComponent.getInstance().setValue(PHRASEAPP_ACCESS_TOKEN, accessToken);
     }
 
-    public String getProjectId() {
-        return PropertiesComponent.getInstance().getValue(PHRASEAPP_PROJECT_ID);
-    }
-
     public void setProjectId(String projectId) {
         PropertiesComponent.getInstance().setValue(PHRASEAPP_PROJECT_ID, projectId);
     }
@@ -80,7 +72,6 @@ public class TokenRepository {
     }
 
     public void setConfig(String s) {
-        System.out.printf(s);
         String projectPath = getProjectPath();
         try {
             File configFile = new File(projectPath + "/.phraseapp.yml");
@@ -124,7 +115,6 @@ public class TokenRepository {
         Project project = (Project) dataContext.getData(DataConstants.PROJECT);
         return project.getBasePath();
     }
-
 }
 
 
