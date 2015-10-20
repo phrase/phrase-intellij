@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -52,13 +53,6 @@ public class PhraseAppConfigurable implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        clientPathField = new TextFieldWithBrowseButton();
-        final FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false) {
-            public boolean isFileSelectable(VirtualFile file) {
-                return file.getName().startsWith("phraseapp");
-            }
-        };
-        clientPathField.addBrowseFolderListener("Choose PhraseApp Client", "", null, fileChooserDescriptor);
 
         if(TokenRepository.getInstance().getClientPath() == null){
             String detected = ClientDetection.findClientInstallation();
@@ -68,33 +62,88 @@ public class PhraseAppConfigurable implements Configurable {
             }
         }
 
+        JPanel rootPanel = new JPanel(new GridBagLayout());
+
+        final JPanel topPanel = getTopPanel();
+        final JPanel settingsUI = getSettingsUI();
+
+        GridBagConstraints cs = new GridBagConstraints();
+
+        cs.fill = GridBagConstraints.HORIZONTAL;
+        cs.anchor = GridBagConstraints.NORTHWEST;
+        cs.insets = new Insets(0, 0, 20, 0);
+        cs.weightx = 0.5;
+        cs.gridx = 0;
+        cs.gridy = 0;
+        cs.gridwidth = 3;
+        rootPanel.add(topPanel, cs);
+        cs.insets = new Insets(0, 0, 10, 0);
+        cs.weighty = 0.5;
+        cs.gridx = 0;
+        cs.gridy = 1;
+        rootPanel.add(settingsUI,cs);
+
+        return rootPanel;
+    }
+
+    private JPanel getTopPanel() {
+        final JPanel infoPanel = new JPanel(new GridLayout(0,1));
+
+        JTextArea infoText = new JTextArea();
+        infoText.setLineWrap(true);
+        infoText.setWrapStyleWord(true);
+        infoText.setEditable(false);
+        infoText.setOpaque(false);
+        Font infoTextFont = infoText.getFont();
+        Font font = new Font(infoTextFont.getFontName(), Font.BOLD, infoTextFont.getSize());
+        infoText.setFont(font);
+        infoText.setText("The PhraseApp plugin requires a installed PhraseApp client and a .phraseapp.yml configuration file.\nSee here for more information: http://docs.phraseapp.com/developers/android_studio");
+        infoPanel.add(infoText);
+        return infoPanel;
+    }
+
+    @NotNull
+    private JPanel getSettingsUI() {
+        final JPanel settingsUI = new JPanel(new GridBagLayout());
+
+        clientPathField = new TextFieldWithBrowseButton();
+        final FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false) {
+            public boolean isFileSelectable(VirtualFile file) {
+                return file.getName().startsWith("phraseapp");
+            }
+        };
+        clientPathField.addBrowseFolderListener("Choose PhraseApp Client", "", null, fileChooserDescriptor);
         clientPathField.setText(TokenRepository.getInstance().getClientPath());
 
         JLabel clientPathLabel = new JLabel();
         clientPathLabel.setText("PhraseApp Client Path");
 
-        final JPanel settingsUI = new JPanel(new GridBagLayout());
         GridBagConstraints cs = new GridBagConstraints();
+
         cs.fill = GridBagConstraints.HORIZONTAL;
+        cs.anchor = GridBagConstraints.PAGE_START;
         cs.insets = new Insets(0, 0, 10, 0);
+        cs.weightx = 0;
         cs.gridx = 0;
         cs.gridy = 0;
         cs.gridwidth = 1;
         settingsUI.add(clientPathLabel, cs);
+        cs.weightx = 0.5;
         cs.gridx = 1;
         cs.gridy = 0;
         cs.gridwidth = 2;
         settingsUI.add(clientPathField, cs);
-        
+
         String config = TokenRepository.getInstance().loadPhraseAppConfig();
 
         if (config.startsWith("phraseapp")) {
 
             JTextArea configLabel = new JTextArea();
+            configLabel.setLineWrap(true);
             configLabel.setEditable(false);
             configLabel.setOpaque(false);
-            configLabel.setText("A .phraseap.yml configuration file has been found in your project.\nLearn more: http://docs.phraseapp.com/developers/cli/configuration/");
-
+            configLabel.setText("A .phraseap.yml configuration file has been found in your project. Please verify that it matches your projects requirenments.");
+            cs.weightx = 0.5;
             cs.gridx = 0;
             cs.gridy = 1;
             cs.gridwidth = 3;
@@ -105,9 +154,7 @@ public class PhraseAppConfigurable implements Configurable {
             initializeDynamicFields();
 
             JScrollPane localesScrollPane = new JScrollPane(defaultLocaleSelect);
-            localesScrollPane.setPreferredSize(new Dimension(120, 60));
             JScrollPane projectsScrollPane = new JScrollPane(projectSelect);
-            projectsScrollPane.setPreferredSize(new Dimension(120, 60));
 
             JLabel projectIdLabel = new JLabel();
             projectIdLabel.setText("PhraseApp Project");
@@ -120,6 +167,13 @@ public class PhraseAppConfigurable implements Configurable {
 
             JLabel defaultLocaleLabel = new JLabel();
             defaultLocaleLabel.setText("Default locale");
+
+            JTextArea generateConfigLabel = new JTextArea();
+            generateConfigLabel.setLineWrap(true);
+            generateConfigLabel.setWrapStyleWord(true);
+            generateConfigLabel.setEditable(false);
+            generateConfigLabel.setOpaque(false);
+            generateConfigLabel.setText("A .phraseapp.yml will be generated with the provided settings. The .phraseapp.yml will be added to your projects root folder.");
 
             defaultStringsPathField = new TextFieldWithBrowseButton();
             final FileChooserDescriptor localeFileChooserDesc = new FileChooserDescriptor(true, false, false, false, false, false) {
@@ -136,68 +190,73 @@ public class PhraseAppConfigurable implements Configurable {
             updateTranslationsCheckbox = new JCheckBox("Update Translations");
             updateTranslationsCheckbox.setSelected(TokenRepository.getInstance().getUpdateTranslations());
 
-            JTextArea generateConfigLabel = new JTextArea();
-            generateConfigLabel.setEditable(false);
-            generateConfigLabel.setOpaque(false);
-            generateConfigLabel.setText("A .phraseapp.yml will be generated with your settings. The .phraseapp.yml will be added to your projects root folder and be editable.\nSee here for more information: http://docs.phraseapp.com/developers/cli/configuration/");
-
+            cs.weightx = 0;
             cs.gridx = 0;
             cs.gridy = 1;
             cs.gridwidth = 1;
             settingsUI.add(accessTokenLabel, cs);
+            cs.weightx = 0.5;
             cs.gridx = 1;
             cs.gridy = 1;
             cs.gridwidth = 2;
             settingsUI.add(accessTokenField, cs);
 
+            cs.weightx = 0.5;
             cs.gridx = 1;
             cs.gridy = 2;
             cs.gridwidth = 2;
             settingsUI.add(accessTokenHint, cs);
 
+            cs.weightx = 0;
             cs.gridx = 0;
             cs.gridy = 3;
             cs.gridwidth = 1;
             settingsUI.add(projectIdLabel, cs);
+            cs.weightx = 0.5;
             cs.gridx = 1;
             cs.gridy = 3;
             cs.gridwidth = 2;
             settingsUI.add(projectsScrollPane, cs);
 
+            cs.weightx = 0;
             cs.gridx = 0;
             cs.gridy = 4;
             cs.gridwidth = 1;
             settingsUI.add(defaultLocaleLabel, cs);
+            cs.weightx = 0.5;
             cs.gridx = 1;
             cs.gridy = 4;
             cs.gridwidth = 2;
             settingsUI.add(localesScrollPane, cs);
 
+            cs.weightx = 0;
             cs.gridx = 0;
             cs.gridy = 5;
             cs.gridwidth = 1;
             settingsUI.add(defaultStringsPathLabel, cs);
+            cs.weightx = 0.5;
             cs.gridx = 1;
             cs.gridy = 5;
             cs.gridwidth = 2;
             settingsUI.add(defaultStringsPathField, cs);
 
+            cs.weightx = 0.5;
             cs.gridx = 1;
             cs.gridy = 6;
             cs.gridwidth = 2;
             settingsUI.add(updateTranslationsCheckbox, cs);
 
-            cs.gridx = 1;
+            cs.weightx = 0.5;
+            cs.gridx = 0;
             cs.gridy = 7;
-            cs.gridwidth = 2;
+            cs.gridwidth = 3;
             settingsUI.add(generateConfigLabel, cs);
         }
-
         return settingsUI;
     }
 
     private void initializeDynamicFields() {
-        accessTokenField = new JTextField(64);
+        accessTokenField = new JTextField();
         accessTokenField.setText(TokenRepository.getInstance().getAccessToken());
 
         projectSelect = new JList(projects);
