@@ -1,6 +1,9 @@
 package com.phraseapp.androidstudio;
 
 import com.intellij.ide.DataManager;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -260,8 +263,10 @@ public class PhraseAppConfigurable implements Configurable {
                         Desktop.getDesktop().browse(event.getURL().toURI());
                     } catch (IOException e) {
                         e.printStackTrace();
+                        JOptionPane.showMessageDialog(settingsUI, "Could not locate browser, please head to " + event.getURL().toString());
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
+                        JOptionPane.showMessageDialog(settingsUI, "Could not locate browser, please head to " + event.getURL().toString());
                     }
                     ;
                 }
