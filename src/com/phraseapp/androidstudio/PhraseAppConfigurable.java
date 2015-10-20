@@ -62,12 +62,10 @@ public class PhraseAppConfigurable implements Configurable {
         }
 
         JPanel rootPanel = new JPanel(new GridBagLayout());
-
         final JPanel topPanel = getTopPanel();
         final JPanel settingsUI = getSettingsUI();
 
         GridBagConstraints cs = new GridBagConstraints();
-
         cs.fill = GridBagConstraints.HORIZONTAL;
         cs.anchor = GridBagConstraints.NORTHWEST;
         cs.insets = new Insets(0, 0, 20, 0);
@@ -87,27 +85,7 @@ public class PhraseAppConfigurable implements Configurable {
 
     private JPanel getTopPanel() {
         final JPanel infoPanel = new JPanel(new GridLayout(0,1));
-
-        JEditorPane infoText = new JEditorPane();
-        infoText.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
-        infoText.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent event) {
-                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    try {
-                        Desktop.getDesktop().browse(event.getURL().toURI());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    };
-                }
-            }
-        });
-        infoText.setEditable(false);
-        infoText.setOpaque(false);
-        infoText.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
-        infoText.setText("<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
+        JEditorPane infoText = createtHyperTextPane("<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
         infoPanel.add(infoText);
         return infoPanel;
     }
@@ -172,37 +150,12 @@ public class PhraseAppConfigurable implements Configurable {
             JLabel accessTokenLabel = new JLabel();
             accessTokenLabel.setText("PhraseApp Access Token");
 
-
-            JEditorPane accessTokenHint = new JEditorPane();
-            accessTokenHint.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
-            accessTokenHint.addHyperlinkListener(new HyperlinkListener() {
-                @Override
-                public void hyperlinkUpdate(HyperlinkEvent event) {
-                    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                        try {
-                            Desktop.getDesktop().browse(event.getURL().toURI());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (URISyntaxException e) {
-                            e.printStackTrace();
-                        };
-                    }
-                }
-            });
-            accessTokenHint.setEditable(false);
-            accessTokenHint.setOpaque(false);
-            accessTokenHint.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
-            accessTokenHint.setText("Please generate a <a href=https://phraseapp.com/settings/oauth_access_tokens>PhraseApp API Access Token</a>");
+            JEditorPane accessTokenHint = createtHyperTextPane("Please generate a <a href=https://phraseapp.com/settings/oauth_access_tokens>PhraseApp API Access Token</a>");
 
             JLabel defaultLocaleLabel = new JLabel();
             defaultLocaleLabel.setText("Default locale");
 
-            JTextArea generateConfigLabel = new JTextArea();
-            generateConfigLabel.setLineWrap(true);
-            generateConfigLabel.setWrapStyleWord(true);
-            generateConfigLabel.setEditable(false);
-            generateConfigLabel.setOpaque(false);
-            generateConfigLabel.setText("A .phraseapp.yml will be generated with the provided settings. The .phraseapp.yml will be added to your projects root folder.");
+            JTextArea generateConfigLabel = createTextPane("A .phraseapp.yml will be generated with the provided settings. The .phraseapp.yml will be added to your projects root folder.");
 
             defaultStringsPathField = new TextFieldWithBrowseButton();
             final FileChooserDescriptor localeFileChooserDesc = new FileChooserDescriptor(true, false, false, false, false, false) {
@@ -282,6 +235,43 @@ public class PhraseAppConfigurable implements Configurable {
             settingsUI.add(generateConfigLabel, cs);
         }
         return settingsUI;
+    }
+
+    @NotNull
+    private JTextArea createTextPane(String text) {
+        JTextArea textPane = new JTextArea();
+        textPane.setLineWrap(true);
+        textPane.setWrapStyleWord(true);
+        textPane.setEditable(false);
+        textPane.setOpaque(false);
+        textPane.setText(text);
+        return textPane;
+    }
+
+    @NotNull
+    private JEditorPane createtHyperTextPane(String text) {
+        JEditorPane hyperTextPane = new JEditorPane();
+        hyperTextPane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
+        hyperTextPane.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent event) {
+                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    try {
+                        Desktop.getDesktop().browse(event.getURL().toURI());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                    ;
+                }
+            }
+        });
+        hyperTextPane.setEditable(false);
+        hyperTextPane.setOpaque(false);
+        hyperTextPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+        hyperTextPane.setText(text);
+        return hyperTextPane;
     }
 
     private void initializeDynamicFields() {
