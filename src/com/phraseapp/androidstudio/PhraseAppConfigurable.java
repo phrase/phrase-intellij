@@ -12,6 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -24,7 +25,6 @@ import java.util.TreeMap;
 
 
 public class PhraseAppConfigurable implements Configurable {
-    private JComponent settingsUI;
     private TextFieldWithBrowseButton clientPathField;
     private JTextField accessTokenField;
     private JList projectSelect;
@@ -35,7 +35,8 @@ public class PhraseAppConfigurable implements Configurable {
     private APIResourceListModel locales = new APIResourceListModel();
     private String projectId = "";
     private String localeId = "";
-    private Boolean generateConfig = false;
+    private String currentConfig;
+    private JPanel rootPanel;
 
     @Nls
     @Override
@@ -52,18 +53,11 @@ public class PhraseAppConfigurable implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-
-        if (TokenRepository.getInstance().getClientPath() == null) {
-            String detected = ClientDetection.findClientInstallation();
-            if (detected != null) {
-                TokenRepository.getInstance().setClientPath(detected);
-                JOptionPane.showMessageDialog(settingsUI, "We found a PhraseApp client on your system: " + detected);
-            }
-        }
-
-        JPanel rootPanel = new JPanel(new GridBagLayout());
+        rootPanel = new JPanel(new GridBagLayout());
         final JPanel topPanel = getTopPanel();
-        final JPanel settingsUI = getSettingsUI();
+        final JPanel settingsUI = getPhraseConfigPanel();
+        final JPanel cliPanel = getCliPanel();
+
 
         GridBagConstraints cs = new GridBagConstraints();
         cs.fill = GridBagConstraints.HORIZONTAL;
@@ -78,6 +72,11 @@ public class PhraseAppConfigurable implements Configurable {
         cs.weighty = 0.5;
         cs.gridx = 0;
         cs.gridy = 1;
+        rootPanel.add(cliPanel, cs);
+        cs.insets = new Insets(0, 0, 10, 0);
+        cs.weighty = 0.5;
+        cs.gridx = 0;
+        cs.gridy = 2;
         rootPanel.add(settingsUI, cs);
 
         return rootPanel;
@@ -90,9 +89,14 @@ public class PhraseAppConfigurable implements Configurable {
         return infoPanel;
     }
 
-    @NotNull
-    private JPanel getSettingsUI() {
-        final JPanel settingsUI = new JPanel(new GridBagLayout());
+    private JPanel getCliPanel(){
+        final JPanel cliPanel = new JPanel(new GridBagLayout());
+
+        String detected = ClientDetection.findClientInstallation();
+        if (detected != null) {
+            TokenRepository.getInstance().setClientPath(detected);
+            JOptionPane.showMessageDialog(cliPanel, "We found a PhraseApp client on your system: " + detected);
+        }
 
         clientPathField = new TextFieldWithBrowseButton();
         final FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false) {
@@ -109,127 +113,131 @@ public class PhraseAppConfigurable implements Configurable {
         GridBagConstraints cs = new GridBagConstraints();
 
         cs.fill = GridBagConstraints.HORIZONTAL;
-        cs.anchor = GridBagConstraints.PAGE_START;
+        cs.anchor = GridBagConstraints.NORTHWEST;
         cs.insets = new Insets(0, 0, 10, 0);
         cs.weightx = 0;
         cs.gridx = 0;
         cs.gridy = 0;
         cs.gridwidth = 1;
-        settingsUI.add(clientPathLabel, cs);
+        cliPanel.add(clientPathLabel, cs);
         cs.weightx = 0.5;
         cs.gridx = 1;
         cs.gridy = 0;
         cs.gridwidth = 2;
-        settingsUI.add(clientPathField, cs);
+        cliPanel.add(clientPathField, cs);
 
-        String config = TokenRepository.getInstance().loadPhraseAppConfig();
+        return cliPanel;
+    }
 
-        if (config.startsWith("phraseapp")) {
-            JTextArea configLabel = createTextPane("A .phraseap.yml configuration file has been found in your project. Please verify that it matches your projects requirenments.");
-            cs.weightx = 0.5;
-            cs.gridx = 0;
-            cs.gridy = 1;
-            cs.gridwidth = 3;
-            settingsUI.add(configLabel, cs);
+    @NotNull
+    private JPanel getPhraseConfigPanel() {
+        final JPanel phraseConfigPanel = new JPanel(new GridBagLayout());
+        currentConfig = TokenRepository.getInstance().loadPhraseAppConfig();
 
+        JEditorPane configInfoText;
+        if (configExists()) {
+            configInfoText = createtHyperTextPane("We have detected an existing <a href=http://docs.phraseapp.com/developers/cli/configuration/>.phraseapp.yml</a> configuration file. If you want to generate a new one then please fill in the following settings:");
         } else {
-            generateConfig = true;
-            initializeDynamicFields();
-
-            JScrollPane localesScrollPane = new JScrollPane(defaultLocaleSelect);
-            JScrollPane projectsScrollPane = new JScrollPane(projectSelect);
-
-            JLabel projectIdLabel = new JLabel();
-            projectIdLabel.setText("PhraseApp Project");
-
-            JLabel accessTokenLabel = new JLabel();
-            accessTokenLabel.setText("PhraseApp Access Token");
-
-            JEditorPane accessTokenHint = createtHyperTextPane("Please generate a <a href=https://phraseapp.com/settings/oauth_access_tokens>PhraseApp API Access Token</a>");
-
-            JLabel defaultLocaleLabel = new JLabel();
-            defaultLocaleLabel.setText("Default locale");
-
-            JTextArea generateConfigLabel = createTextPane("A .phraseapp.yml will be generated with the provided settings. The .phraseapp.yml will be added to your projects root folder.");
-
-            defaultStringsPathField = new TextFieldWithBrowseButton();
-            final FileChooserDescriptor localeFileChooserDesc = new FileChooserDescriptor(true, false, false, false, false, false) {
-                public boolean isFileSelectable(VirtualFile file) {
-                    return file.getName().startsWith("strings");
-                }
-            };
-
-            defaultStringsPathField.addBrowseFolderListener("Choose default locale", "", null, localeFileChooserDesc);
-            defaultStringsPathField.setText(TokenRepository.getInstance().getDefaultStringsPath());
-            JLabel defaultStringsPathLabel = new JLabel();
-            defaultStringsPathLabel.setText("Default strings");
-
-            updateTranslationsCheckbox = new JCheckBox("Update Translations");
-            updateTranslationsCheckbox.setSelected(TokenRepository.getInstance().getUpdateTranslations());
-
-            cs.weightx = 0;
-            cs.gridx = 0;
-            cs.gridy = 1;
-            cs.gridwidth = 1;
-            settingsUI.add(accessTokenLabel, cs);
-            cs.weightx = 0.5;
-            cs.gridx = 1;
-            cs.gridy = 1;
-            cs.gridwidth = 2;
-            settingsUI.add(accessTokenField, cs);
-
-            cs.weightx = 0.5;
-            cs.gridx = 1;
-            cs.gridy = 2;
-            cs.gridwidth = 2;
-            settingsUI.add(accessTokenHint, cs);
-
-            cs.weightx = 0;
-            cs.gridx = 0;
-            cs.gridy = 3;
-            cs.gridwidth = 1;
-            settingsUI.add(projectIdLabel, cs);
-            cs.weightx = 0.5;
-            cs.gridx = 1;
-            cs.gridy = 3;
-            cs.gridwidth = 2;
-            settingsUI.add(projectsScrollPane, cs);
-
-            cs.weightx = 0;
-            cs.gridx = 0;
-            cs.gridy = 4;
-            cs.gridwidth = 1;
-            settingsUI.add(defaultLocaleLabel, cs);
-            cs.weightx = 0.5;
-            cs.gridx = 1;
-            cs.gridy = 4;
-            cs.gridwidth = 2;
-            settingsUI.add(localesScrollPane, cs);
-
-            cs.weightx = 0;
-            cs.gridx = 0;
-            cs.gridy = 5;
-            cs.gridwidth = 1;
-            settingsUI.add(defaultStringsPathLabel, cs);
-            cs.weightx = 0.5;
-            cs.gridx = 1;
-            cs.gridy = 5;
-            cs.gridwidth = 2;
-            settingsUI.add(defaultStringsPathField, cs);
-
-            cs.weightx = 0.5;
-            cs.gridx = 1;
-            cs.gridy = 6;
-            cs.gridwidth = 2;
-            settingsUI.add(updateTranslationsCheckbox, cs);
-
-            cs.weightx = 0.5;
-            cs.gridx = 0;
-            cs.gridy = 7;
-            cs.gridwidth = 3;
-            settingsUI.add(generateConfigLabel, cs);
+            configInfoText = createtHyperTextPane("Please fill in the following settings in order to generate a <a href=http://docs.phraseapp.com/developers/cli/configuration/>.phraseapp.yml</a> configuration file. ");
         }
-        return settingsUI;
+
+        initializeDynamicFields();
+
+        JScrollPane localesScrollPane = new JScrollPane(defaultLocaleSelect);
+        JScrollPane projectsScrollPane = new JScrollPane(projectSelect);
+
+        JLabel projectIdLabel = new JLabel();
+        projectIdLabel.setText("PhraseApp Project");
+
+        JLabel accessTokenLabel = new JLabel();
+        accessTokenLabel.setText("PhraseApp Access Token");
+
+        JEditorPane accessTokenHint = createtHyperTextPane("Please generate a <a href=https://phraseapp.com/settings/oauth_access_tokens>PhraseApp API Access Token</a>");
+
+        JLabel defaultLocaleLabel = new JLabel();
+        defaultLocaleLabel.setText("Default locale");
+
+        defaultStringsPathField = new TextFieldWithBrowseButton();
+        final FileChooserDescriptor localeFileChooserDesc = new FileChooserDescriptor(true, false, false, false, false, false) {
+            public boolean isFileSelectable(VirtualFile file) {
+                return file.getName().startsWith("strings");
+            }
+        };
+
+        defaultStringsPathField.addBrowseFolderListener("Choose default locale", "", null, localeFileChooserDesc);
+        defaultStringsPathField.setText(TokenRepository.getInstance().getDefaultStringsPath());
+        JLabel defaultStringsPathLabel = new JLabel();
+        defaultStringsPathLabel.setText("Default strings");
+
+        updateTranslationsCheckbox = new JCheckBox("Update Translations");
+
+        GridBagConstraints cs = new GridBagConstraints();
+
+        cs.fill = GridBagConstraints.HORIZONTAL;
+        cs.anchor = GridBagConstraints.NORTHWEST;
+        cs.insets = new Insets(0, 0, 10, 0);
+        cs.weightx = 0.5;
+        cs.gridx = 0;
+        cs.gridy = 0;
+        cs.gridwidth = 3;
+        phraseConfigPanel.add(configInfoText, cs);
+        cs.weightx = 0;
+        cs.gridx = 0;
+        cs.gridy = 1;
+        cs.gridwidth = 1;
+        phraseConfigPanel.add(accessTokenLabel, cs);
+        cs.weightx = 0.5;
+        cs.gridx = 1;
+        cs.gridy = 1;
+        cs.gridwidth = 2;
+        phraseConfigPanel.add(accessTokenField, cs);
+
+        cs.weightx = 0.5;
+        cs.gridx = 1;
+        cs.gridy = 2;
+        cs.gridwidth = 2;
+        phraseConfigPanel.add(accessTokenHint, cs);
+
+        cs.weightx = 0;
+        cs.gridx = 0;
+        cs.gridy = 3;
+        cs.gridwidth = 1;
+        phraseConfigPanel.add(projectIdLabel, cs);
+        cs.weightx = 0.5;
+        cs.gridx = 1;
+        cs.gridy = 3;
+        cs.gridwidth = 2;
+        phraseConfigPanel.add(projectsScrollPane, cs);
+
+        cs.weightx = 0;
+        cs.gridx = 0;
+        cs.gridy = 4;
+        cs.gridwidth = 1;
+        phraseConfigPanel.add(defaultLocaleLabel, cs);
+        cs.weightx = 0.5;
+        cs.gridx = 1;
+        cs.gridy = 4;
+        cs.gridwidth = 2;
+        phraseConfigPanel.add(localesScrollPane, cs);
+
+        cs.weightx = 0;
+        cs.gridx = 0;
+        cs.gridy = 5;
+        cs.gridwidth = 1;
+        phraseConfigPanel.add(defaultStringsPathLabel, cs);
+        cs.weightx = 0.5;
+        cs.gridx = 1;
+        cs.gridy = 5;
+        cs.gridwidth = 2;
+        phraseConfigPanel.add(defaultStringsPathField, cs);
+
+        cs.weightx = 0.5;
+        cs.gridx = 1;
+        cs.gridy = 6;
+        cs.gridwidth = 2;
+        phraseConfigPanel.add(updateTranslationsCheckbox, cs);
+
+        return phraseConfigPanel;
     }
 
     @NotNull
@@ -243,37 +251,9 @@ public class PhraseAppConfigurable implements Configurable {
         return textPane;
     }
 
-    @NotNull
-    private JEditorPane createtHyperTextPane(String text) {
-        JEditorPane hyperTextPane = new JEditorPane();
-        hyperTextPane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
-        hyperTextPane.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent event) {
-                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    try {
-                        Desktop.getDesktop().browse(event.getURL().toURI());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        JOptionPane.showMessageDialog(settingsUI, "Could not locate browser, please head to " + event.getURL().toString());
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                        JOptionPane.showMessageDialog(settingsUI, "Could not locate browser, please head to " + event.getURL().toString());
-                    }
-                    ;
-                }
-            }
-        });
-        hyperTextPane.setEditable(false);
-        hyperTextPane.setOpaque(false);
-        hyperTextPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
-        hyperTextPane.setText(text);
-        return hyperTextPane;
-    }
-
     private void initializeDynamicFields() {
         accessTokenField = new JTextField();
-        accessTokenField.setText(TokenRepository.getInstance().getAccessToken());
+        accessTokenField.setText(getAccessToken());
 
         projectSelect = new JList(projects);
         projectSelect.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -289,8 +269,12 @@ public class PhraseAppConfigurable implements Configurable {
         } else {
             API api = new API(accessTokenField.getText().trim());
             projects = api.getProjects();
-            projectSelect.setModel(projects);
-            projectSelect.setEnabled(true);
+            if (projects != null) {
+                projectSelect.setModel(projects);
+                projectSelect.setEnabled(true);
+            } else {
+                accessTokenField.setText("");
+            }
         }
 
         accessTokenField.getDocument().addDocumentListener(new DocumentListener() {
@@ -351,9 +335,9 @@ public class PhraseAppConfigurable implements Configurable {
         if (!projectId.isEmpty()) {
             locales = api.getLocales(projectId);
             if (locales.isEmpty()) {
-               String[] localesList = { "en", "de", "fr", "es", "it", "pt", "zh" };
+                String[] localesList = {"en", "de", "fr", "es", "it", "pt", "zh"};
 
-                String localeName = (String) JOptionPane.showInputDialog(settingsUI,
+                String localeName = (String) JOptionPane.showInputDialog(rootPanel,
                         "No locales found. What is the name of the locale we should create for you?",
                         "PhraseApp",
                         JOptionPane.QUESTION_MESSAGE,
@@ -363,7 +347,7 @@ public class PhraseAppConfigurable implements Configurable {
                 locales = api.postLocales(projectId, localeName);
                 defaultLocaleSelect.setModel(locales);
                 defaultLocaleSelect.setEnabled(true);
-            }else{
+            } else {
                 defaultLocaleSelect.setModel(locales);
                 defaultLocaleSelect.setEnabled(true);
             }
@@ -401,7 +385,7 @@ public class PhraseAppConfigurable implements Configurable {
             }
         } else {
             projectSelect.setEnabled(false);
-            JOptionPane.showMessageDialog(settingsUI, "The access_token is not valid. Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
+            JOptionPane.showMessageDialog(rootPanel, "The access_token is not valid. Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
         }
     }
 
@@ -413,25 +397,30 @@ public class PhraseAppConfigurable implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         if (clientPathField.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(settingsUI, "Please select the phraseapp client");
+            JOptionPane.showMessageDialog(rootPanel, "Please select the phraseapp client");
             return;
         }
 
         TokenRepository.getInstance().setClientPath(clientPathField.getText().trim());
 
-        if (generateConfig) {
-            if (accessTokenField.getText().isEmpty() || projectId.isEmpty()){
-                JOptionPane.showMessageDialog(settingsUI, "Please make sure to enter a PhraseApp access_token and select a project.");
-                return;
-            }
-
-            TokenRepository.getInstance().generateConfig(getConfigMap());
-            TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
-            TokenRepository.getInstance().setProjectId(projectId);
-            TokenRepository.getInstance().setDefaultStringsPath(defaultStringsPathField.getText().trim());
-            TokenRepository.getInstance().setUpdateTranslations(updateTranslationsCheckbox.isSelected());
-            TokenRepository.getInstance().setDefaultLocale(localeId);
+        int genrateConfigChoice = JOptionPane.YES_OPTION;
+        if (configExists()) {
+            genrateConfigChoice = JOptionPane.showOptionDialog(null,
+                    "Should we generate a new .phraseap.yml with your current seetings?",
+                    "PhraseApp",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, null, null);
         }
+
+        if (genrateConfigChoice == JOptionPane.YES_OPTION) {
+            TokenRepository.getInstance().generateConfig(getConfigMap());
+        }
+
+        TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
+        TokenRepository.getInstance().setDefaultStringsPath(defaultStringsPathField.getText().trim());
+        TokenRepository.getInstance().setDefaultLocale(localeId);
+
     }
 
     @Override
@@ -441,9 +430,9 @@ public class PhraseAppConfigurable implements Configurable {
 
     @Override
     public void disposeUIResources() {
-        if (settingsUI != null) {
-            settingsUI.removeAll();
-            settingsUI = null;
+        if (rootPanel != null) {
+            rootPanel.removeAll();
+            rootPanel = null;
         }
     }
 
@@ -498,5 +487,56 @@ public class PhraseAppConfigurable implements Configurable {
         DataContext dataContext = DataManager.getInstance().getDataContext();
         Project project = (Project) dataContext.getData(DataConstants.PROJECT);
         return project;
+    }
+
+    private String getAccessToken() {
+        if (configExists()) {
+            System.out.printf(getAccessTokenFromConfig());
+            return getAccessTokenFromConfig();
+        } else {
+            System.out.printf("no config");
+
+            return TokenRepository.getInstance().getAccessToken();
+        }
+    }
+
+    private String getAccessTokenFromConfig() {
+        Yaml yaml = new Yaml();
+        Map configYml = (Map) yaml.load(currentConfig);
+        Map root = (Map) configYml.get("phraseapp");
+        return (String) root.get("access_token");
+    }
+
+    @NotNull
+    private JEditorPane createtHyperTextPane(String text) {
+        JEditorPane hyperTextPane = new JEditorPane();
+        hyperTextPane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
+        hyperTextPane.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent event) {
+                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    try {
+                        Desktop.getDesktop().browse(event.getURL().toURI());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
+                    }
+                    ;
+                }
+            }
+        });
+        hyperTextPane.setEditable(false);
+        hyperTextPane.setOpaque(false);
+        hyperTextPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+        hyperTextPane.setText(text);
+        return hyperTextPane;
+    }
+
+    private boolean configExists() {
+        System.out.printf(currentConfig);
+        return currentConfig.startsWith("phraseapp");
     }
 }

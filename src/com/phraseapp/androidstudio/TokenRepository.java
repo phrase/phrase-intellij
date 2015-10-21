@@ -17,7 +17,6 @@ import java.util.Scanner;
 public class TokenRepository {
     public static final String PHRASEAPP_CLIENT_PATH = "PHRASEAPP_CLIENT_PATH";
     public static final String PHRASEAPP_ACCESS_TOKEN = "PHRASEAPP_ACCESS_TOKEN";
-    public static final String PHRASEAPP_PROJECT_ID = "PHRASEAPP_PROJECT_ID";
     public static final String PHRASEAPP_UPDATE_TRANSLATIONS = "PHRASEAPP_UPDATE_TRANSLATIONS";
     public static final String PHRASEAPP_DEFAULT_STRINGS_PATH = "DEFAULT_STRINGS_PATH";
     public static final String PHRASEAPP_DEFAULT_LOCALE_PATH = "DEFAULT_LOCALE_PATH";
@@ -57,18 +56,6 @@ public class TokenRepository {
 
     public void setAccessToken(String accessToken) {
         PropertiesComponent.getInstance().setValue(PHRASEAPP_ACCESS_TOKEN, accessToken);
-    }
-
-    public void setProjectId(String projectId) {
-        PropertiesComponent.getInstance().setValue(PHRASEAPP_PROJECT_ID, projectId);
-    }
-
-    public boolean getUpdateTranslations() {
-        return PropertiesComponent.getInstance().getBoolean(PHRASEAPP_UPDATE_TRANSLATIONS, false);
-    }
-
-    public void setUpdateTranslations(boolean update) {
-        PropertiesComponent.getInstance().setValue(PHRASEAPP_UPDATE_TRANSLATIONS, Boolean.toString(update));
     }
 
     public void setConfig(String s) {
