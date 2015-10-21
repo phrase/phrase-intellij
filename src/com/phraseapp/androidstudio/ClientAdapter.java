@@ -9,6 +9,7 @@ import com.intellij.execution.process.ProcessListener;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.wm.ToolWindow;
@@ -68,7 +69,7 @@ public class ClientAdapter {
             processHandler.addProcessListener(new ProcessListener() {
                 @Override
                 public void startNotified(ProcessEvent event) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             finalArea.setEditable(true);
@@ -79,7 +80,7 @@ public class ClientAdapter {
 
                 @Override
                 public void processTerminated(ProcessEvent event) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             finalArea.append(Color.getHSBColor(0.000f, 0.000f, 0.000f), getFormattedTime() + "Finished\n");
@@ -95,7 +96,7 @@ public class ClientAdapter {
 
                 @Override
                 public void onTextAvailable(final ProcessEvent event, final Key outputType) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (event.getText().length() < 5) {

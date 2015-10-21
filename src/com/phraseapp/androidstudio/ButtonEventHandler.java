@@ -13,7 +13,7 @@ import com.intellij.openapi.project.Project;
 public class ButtonEventHandler {
     public void handleEvent(final AnActionEvent e, final String clientAction) {
         Project project = e.getProject();
-        TokenRepository token_repo = TokenRepository.getInstance();
+        PropertiesRepository token_repo = PropertiesRepository.getInstance();
         final String clientPath = token_repo.getClientPath();
 
         if (clientPath.isEmpty()) {

@@ -94,7 +94,7 @@ public class PhraseAppConfigurable implements Configurable {
 
         String detected = ClientDetection.findClientInstallation();
         if (detected != null) {
-            TokenRepository.getInstance().setClientPath(detected);
+            PropertiesRepository.getInstance().setClientPath(detected);
             JOptionPane.showMessageDialog(cliPanel, "We found a PhraseApp client on your system: " + detected);
         }
 
@@ -105,7 +105,7 @@ public class PhraseAppConfigurable implements Configurable {
             }
         };
         clientPathField.addBrowseFolderListener("Choose PhraseApp Client", "", null, fileChooserDescriptor);
-        clientPathField.setText(TokenRepository.getInstance().getClientPath());
+        clientPathField.setText(PropertiesRepository.getInstance().getClientPath());
 
         JLabel clientPathLabel = new JLabel();
         clientPathLabel.setText("PhraseApp Client Path");
@@ -132,7 +132,8 @@ public class PhraseAppConfigurable implements Configurable {
     @NotNull
     private JPanel getPhraseConfigPanel() {
         final JPanel phraseConfigPanel = new JPanel(new GridBagLayout());
-        currentConfig = TokenRepository.getInstance().loadPhraseAppConfig();
+        PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
+        currentConfig = configuration.loadPhraseAppConfig();
 
         JEditorPane configInfoText;
         if (configExists()) {
@@ -165,7 +166,7 @@ public class PhraseAppConfigurable implements Configurable {
         };
 
         defaultStringsPathField.addBrowseFolderListener("Choose default locale", "", null, localeFileChooserDesc);
-        defaultStringsPathField.setText(TokenRepository.getInstance().getDefaultStringsPath());
+        defaultStringsPathField.setText(PropertiesRepository.getInstance().getDefaultStringsPath());
         JLabel defaultStringsPathLabel = new JLabel();
         defaultStringsPathLabel.setText("Default strings");
 
@@ -401,7 +402,7 @@ public class PhraseAppConfigurable implements Configurable {
             return;
         }
 
-        TokenRepository.getInstance().setClientPath(clientPathField.getText().trim());
+        PropertiesRepository.getInstance().setClientPath(clientPathField.getText().trim());
 
         int genrateConfigChoice = JOptionPane.YES_OPTION;
         if (configExists()) {
@@ -414,18 +415,17 @@ public class PhraseAppConfigurable implements Configurable {
         }
 
         if (genrateConfigChoice == JOptionPane.YES_OPTION) {
-            TokenRepository.getInstance().generateConfig(getConfigMap());
+            PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
+            configuration.generateConfig(getConfigMap());
         }
 
-        TokenRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
-        TokenRepository.getInstance().setDefaultStringsPath(defaultStringsPathField.getText().trim());
-        TokenRepository.getInstance().setDefaultLocale(localeId);
-
+        PropertiesRepository.getInstance().setAccessToken(accessTokenField.getText().trim());
+        PropertiesRepository.getInstance().setDefaultStringsPath(defaultStringsPathField.getText().trim());
     }
 
     @Override
     public void reset() {
-        clientPathField.setText(TokenRepository.getInstance().getClientPath());
+        clientPathField.setText(PropertiesRepository.getInstance().getClientPath());
     }
 
     @Override
@@ -496,7 +496,7 @@ public class PhraseAppConfigurable implements Configurable {
         } else {
             System.out.printf("no config");
 
-            return TokenRepository.getInstance().getAccessToken();
+            return PropertiesRepository.getInstance().getAccessToken();
         }
     }
 
