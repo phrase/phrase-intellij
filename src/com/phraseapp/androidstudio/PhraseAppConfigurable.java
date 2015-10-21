@@ -1,9 +1,6 @@
 package com.phraseapp.androidstudio;
 
 import com.intellij.ide.DataManager;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -56,9 +53,9 @@ public class PhraseAppConfigurable implements Configurable {
     @Override
     public JComponent createComponent() {
 
-        if(TokenRepository.getInstance().getClientPath() == null){
+        if (TokenRepository.getInstance().getClientPath() == null) {
             String detected = ClientDetection.findClientInstallation();
-            if (detected != null){
+            if (detected != null) {
                 TokenRepository.getInstance().setClientPath(detected);
                 JOptionPane.showMessageDialog(settingsUI, "We found a PhraseApp client on your system: " + detected);
             }
@@ -81,13 +78,13 @@ public class PhraseAppConfigurable implements Configurable {
         cs.weighty = 0.5;
         cs.gridx = 0;
         cs.gridy = 1;
-        rootPanel.add(settingsUI,cs);
+        rootPanel.add(settingsUI, cs);
 
         return rootPanel;
     }
 
     private JPanel getTopPanel() {
-        final JPanel infoPanel = new JPanel(new GridLayout(0,1));
+        final JPanel infoPanel = new JPanel(new GridLayout(0, 1));
         JEditorPane infoText = createtHyperTextPane("<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
         infoPanel.add(infoText);
         return infoPanel;
@@ -128,12 +125,7 @@ public class PhraseAppConfigurable implements Configurable {
         String config = TokenRepository.getInstance().loadPhraseAppConfig();
 
         if (config.startsWith("phraseapp")) {
-
-            JTextArea configLabel = new JTextArea();
-            configLabel.setLineWrap(true);
-            configLabel.setEditable(false);
-            configLabel.setOpaque(false);
-            configLabel.setText("A .phraseap.yml configuration file has been found in your project. Please verify that it matches your projects requirenments.");
+            JTextArea configLabel = createTextPane("A .phraseap.yml configuration file has been found in your project. Please verify that it matches your projects requirenments.");
             cs.weightx = 0.5;
             cs.gridx = 0;
             cs.gridy = 1;
@@ -334,16 +326,7 @@ public class PhraseAppConfigurable implements Configurable {
                         defaultLocaleSelect.setEnabled(false);
 
                     } else {
-                        API api = new API(accessTokenField.getText().trim());
-                        APIResource project = projects.getModelAt(
-                                projectSelect.getSelectedIndex());
-                        projectId = project.getId();
-
-                        if (!projectId.isEmpty()) {
-                            locales = api.getLocales(projectId);
-                            defaultLocaleSelect.setModel(locales);
-                            defaultLocaleSelect.setEnabled(true);
-                        }
+                        updateLocaleSelect();
                     }
                 }
             }
@@ -359,6 +342,34 @@ public class PhraseAppConfigurable implements Configurable {
         });
     }
 
+    private void updateLocaleSelect() {
+        API api = new API(accessTokenField.getText().trim());
+        APIResource project = projects.getModelAt(
+                projectSelect.getSelectedIndex());
+        projectId = project.getId();
+
+        if (!projectId.isEmpty()) {
+            locales = api.getLocales(projectId);
+            if (locales.isEmpty()) {
+               String[] localesList = { "en", "de", "fr", "es", "it", "pt", "zh" };
+
+                String localeName = (String) JOptionPane.showInputDialog(settingsUI,
+                        "No locales found. What is the name of the locale we should create for you?",
+                        "PhraseApp",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        localesList,
+                        localesList[0]);
+                locales = api.postLocales(projectId, localeName);
+                defaultLocaleSelect.setModel(locales);
+                defaultLocaleSelect.setEnabled(true);
+            }else{
+                defaultLocaleSelect.setModel(locales);
+                defaultLocaleSelect.setEnabled(true);
+            }
+        }
+    }
+
     private void resetProjectSelect() {
         projects = new APIResourceListModel();
         projectSelect.setModel(projects);
@@ -369,8 +380,25 @@ public class PhraseAppConfigurable implements Configurable {
         projects = api.getProjects();
 
         if (projects != null) {
-            projectSelect.setModel(projects);
-            projectSelect.setEnabled(true);
+            if (projects.isEmpty()) {
+                int choice = JOptionPane.showOptionDialog(null,
+                        "No projects found. Should we create an initial project for you?",
+                        "PhraseApp",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null, null, null);
+                if (choice == JOptionPane.YES_OPTION) {
+                    projects = api.postProjects(getProject().getName());
+                    if (projects != null) {
+                        projectSelect.setModel(projects);
+                        projectSelect.setEnabled(true);
+                    }
+                }
+
+            } else {
+                projectSelect.setModel(projects);
+                projectSelect.setEnabled(true);
+            }
         } else {
             projectSelect.setEnabled(false);
             JOptionPane.showMessageDialog(settingsUI, "The access_token is not valid. Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
@@ -392,8 +420,8 @@ public class PhraseAppConfigurable implements Configurable {
         TokenRepository.getInstance().setClientPath(clientPathField.getText().trim());
 
         if (generateConfig) {
-            if (accessTokenField.getText().isEmpty() || projectId.isEmpty() || localeId.isEmpty()) {
-                JOptionPane.showMessageDialog(settingsUI, "Please make sure to enter a PhraseApp access_token, select a project and a default locale.");
+            if (accessTokenField.getText().isEmpty() || projectId.isEmpty()){
+                JOptionPane.showMessageDialog(settingsUI, "Please make sure to enter a PhraseApp access_token and select a project.");
                 return;
             }
 
@@ -464,5 +492,11 @@ public class PhraseAppConfigurable implements Configurable {
 
     private String getPullPath(String defaultLocalePath) {
         return defaultLocalePath.replaceAll("values", "values-<locale_name>");
+    }
+
+    private Project getProject() {
+        DataContext dataContext = DataManager.getInstance().getDataContext();
+        Project project = (Project) dataContext.getData(DataConstants.PROJECT);
+        return project;
     }
 }
