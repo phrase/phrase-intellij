@@ -13,15 +13,15 @@ import com.intellij.openapi.project.Project;
 public class ButtonEventHandler {
     public void handleEvent(final AnActionEvent e, final String clientAction) {
         Project project = e.getProject();
-        PropertiesRepository token_repo = PropertiesRepository.getInstance();
-        final String clientPath = token_repo.getClientPath();
+        PhraseAppConfiguration configuration = new PhraseAppConfiguration(e.getProject());
+        final String clientPath = PropertiesRepository.getInstance().getClientPath();
 
         if (clientPath.isEmpty()) {
             Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the 'phraseapp' client you want to use in the plugin settings.", NotificationType.ERROR));
             return;
         }
 
-        if (!token_repo.loadPhraseAppConfig().startsWith("phraseapp")) {
+        if (!configuration.loadPhraseAppConfig().startsWith("phraseapp")) {
             Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please create a '.phraseapp.yml' configuration file in your project root folder. You can generate a '.phraseapp.yml' configuration file in the plugin settings.", NotificationType.ERROR));
             return;
         }
