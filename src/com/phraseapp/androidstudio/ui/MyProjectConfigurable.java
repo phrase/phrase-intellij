@@ -84,13 +84,15 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
         currentConfig = configuration.loadPhraseAppConfig();
 
-        String clientPath = ClientDetection.findClientInstallation();
-        if (clientPath != null) {
-            PropertiesRepository.getInstance().setClientPath(clientPath);
-            JOptionPane.showMessageDialog(rootPanel, "We found a PhraseApp client on your system: " + clientPath);
-        } else {
-            clientPath = PropertiesRepository.getInstance().getClientPath();
+        if(PropertiesRepository.getInstance().getClientPath() == null){
+            String detected = ClientDetection.findClientInstallation();
+            if(detected != null){
+                PropertiesRepository.getInstance().setClientPath(detected);
+                JOptionPane.showMessageDialog(rootPanel, "We found a PhraseApp client on your system: " + detected);
+            }
         }
+
+        String clientPath = PropertiesRepository.getInstance().getClientPath();
         clientPathFormattedTextField.setText(clientPath);
 
         String accessToken = getAccessToken();
