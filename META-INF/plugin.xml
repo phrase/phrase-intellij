@@ -42,22 +42,29 @@
     </project-components>
 
     <actions>
-        <group id="PhraseApp.PhraseAppMenu" text="PhraseApp" description="PhraseApp">
-            <add-to-group group-id="MainMenu" anchor="last"/>
-            <action id="com.phraseapp.androidstudio.PhraseAppDownload"
-                    class="com.phraseapp.androidstudio.DownloadButton" text="Download Locales"
-                    description="Download Locales from PhraseApp">
-                <keyboard-shortcut keymap="$default" first-keystroke="shift control D" />
-            </action>
-
-            <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.UploadButton"
-                    text="Upload Locales" description="Upload Locales to PhraseApp">
-                <keyboard-shortcut keymap="$default" first-keystroke="shift control U" />
-            </action>
-            <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.WebButton"
-                    text="PhraseApp Translation Center"
-                    description="Open the PhraseApp Translation Center in your browser"/>
+        <group id="PhraseAppToolGroup" popup="true" text="PhraseApp" icon="/phrase_13x13.png"
+               class="com.phraseapp.androidstudio.PhraseAppToolGroup">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
+
+        <action id="com.phraseapp.androidstudio.PhraseAppDownload"
+                class="com.phraseapp.androidstudio.DownloadButton" text="Download Locales"
+                description="Download Locales from PhraseApp">
+            <keyboard-shortcut keymap="$default" first-keystroke="shift control D"/>
+            <add-to-group group-id="PhraseAppToolGroup" anchor="first"/>
+        </action>
+
+        <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.UploadButton"
+                text="Upload Locales" description="Upload Locales to PhraseApp">
+            <keyboard-shortcut keymap="$default" first-keystroke="shift control U"/>
+            <add-to-group group-id="PhraseAppToolGroup" />
+        </action>
+        <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.WebButton"
+                text="PhraseApp Translation Center"
+                description="Open the PhraseApp Translation Center in your browser">
+            <add-to-group group-id="PhraseAppToolGroup" anchor="last"/>
+        </action>
+
     </actions>
 
 </idea-plugin>
