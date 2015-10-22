@@ -271,7 +271,7 @@ public class PhraseAppConfigurable implements Configurable {
         if (accessTokenField.getText().isEmpty()) {
             projectSelect.setEnabled(false);
         } else {
-            API api = new API(accessTokenField.getText().trim());
+            API api = new API(accessTokenField.getText().trim(), getProject().getBasePath());
             projects = api.getProjects();
             if (projects != null) {
                 projectSelect.setModel(projects);
@@ -331,7 +331,7 @@ public class PhraseAppConfigurable implements Configurable {
     }
 
     private void updateLocaleSelect() {
-        API api = new API(accessTokenField.getText().trim());
+        API api = new API(accessTokenField.getText().trim(), getProject().getBasePath());
         APIResource project = projects.getModelAt(
                 projectSelect.getSelectedIndex());
         projectId = project.getId();
@@ -364,7 +364,7 @@ public class PhraseAppConfigurable implements Configurable {
     }
 
     private void updateProjectSelect() {
-        API api = new API(accessTokenField.getText().trim());
+        API api = new API(accessTokenField.getText().trim(), getProject().getBasePath());
         projects = api.getProjects();
 
         if (projects != null) {

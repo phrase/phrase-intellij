@@ -1,5 +1,9 @@
 package com.phraseapp.androidstudio;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.CapturingProcessHandler;
+import com.intellij.execution.process.ProcessOutput;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -8,121 +12,98 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
 public class API {
 
     public static final String PHRASEAPP_VERSION = "2.3";
     public static final String PHRASEAPP_API_BASEURL = "https://api.phraseapp.com/v2/";
     public static final String PHRASEAPP_USER_AGENT = "PhraseApp AndroidStudio " + PHRASEAPP_VERSION;
-    private final String access_token;
+    private final String accessToken;
+    private final String workingDir;
 
-    public API(String access_token) {
-        this.access_token = access_token;
+    public API(String access_token, String basePath) {
+        this.accessToken = access_token;
+        this.workingDir = basePath;
     }
-
-
-    public Unirest buildClient() {
-        Unirest client = new Unirest();
-        client.setDefaultHeader("Authorization", "token " + access_token);
-        client.setDefaultHeader("User-Agent", PHRASEAPP_USER_AGENT);
-        return client;
-    }
-
 
     // Get all locales
-    public APIResourceListModel getLocales(String id) {
-        HttpResponse<JsonNode> rsp = null;
-        try {
-            rsp = buildClient().get(PHRASEAPP_API_BASEURL + "projects/" + id + "/locales")
-                    .asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-
-        APIResourceListModel localeList = new APIResourceListModel();
-
-        JSONArray locales = rsp.getBody().getArray();
-        for (int i = 0; i < locales.length(); i++) {
-            JSONObject loc = (JSONObject) locales.get(i);
-            localeList.addElement(new APIResource((String) loc.get("id"), (String) loc.get("name")));
-        }
-
-        return localeList;
+    public APIResourceListModel getLocales(String projectId) {
+        List<String> params = new ArrayList<String>();
+        params.add(projectId);
+        return runCommand("locales", "list", params);
     }
 
 
     // Get all projects
     public APIResourceListModel getProjects() {
-        HttpResponse<JsonNode> rsp = null;
-        try {
-            rsp = buildClient().get(PHRASEAPP_API_BASEURL + "projects")
-                    .asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-
-        if (rsp != null && rsp.getStatus() == 200) {
-            APIResourceListModel projectList = new APIResourceListModel();
-
-            JSONArray projects = rsp.getBody().getArray();
-            for (int i = 0; i < projects.length(); i++) {
-                JSONObject pro = (JSONObject) projects.get(i);
-                projectList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
-            }
-
-            return projectList;
-        } else {
-            return null;
-        }
+        return runCommand("projects", "list", null);
     }
 
     // Create project
     public APIResourceListModel postProjects(String name) {
-        HttpResponse<JsonNode> rsp = null;
-        try {
-            Unirest client = buildClient();
-            rsp = client.post(PHRASEAPP_API_BASEURL + "projects").field("name", name).field("main_format", "xml")
-                    .asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-
-        if (rsp != null && rsp.getStatus() == 201) {
-            APIResourceListModel projectList = new APIResourceListModel();
-
-            JSONObject pro = rsp.getBody().getObject();
-            projectList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
-
-            return projectList;
-        } else {
-            return null;
-        }
+        List<String> params = new ArrayList<String>();
+        params.add("--name");
+        params.add(name);
+        params.add("--main-format");
+        params.add("xml");
+        return runCommand("project", "create", params);
     }
 
     public APIResourceListModel postLocales(String projectId, String localeName) {
-        return post(projectId, localeName);
+        List<String> params = new ArrayList<String>();
+        params.add(projectId);
+        params.add("--name");
+        params.add(localeName);
+        params.add("--code");
+        params.add(localeName);
+        return runCommand("locale", "create", params);
     }
 
     @Nullable
-    private APIResourceListModel post(String projectId, String localeName) {
-        HttpResponse<JsonNode> rsp = null;
+    private APIResourceListModel runCommand(String resource, String action, List<String> params) {
+        GeneralCommandLine gcl = new GeneralCommandLine(PropertiesRepository.getInstance().getClientPath(),
+                resource);
+        gcl.addParameter(action);
+
+        if (params != null) {
+            gcl.addParameters(params);
+        }
+
+        gcl.addParameter("--access-token");
+        gcl.addParameter(accessToken);
+
+        gcl.withWorkDirectory(workingDir);
+        System.out.printf(gcl.getCommandLineString());
         try {
-            Unirest client = buildClient();
-            rsp = client.post(PHRASEAPP_API_BASEURL + "projects/" + projectId + "/locales").field("name", localeName).field("code", localeName)
-                    .asJson();
-        } catch (UnirestException e) {
+            final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
+            ProcessOutput output = processHandler.runProcess();
+            String response = output.getStdout();
+            System.out.printf(response);
+            if (!response.isEmpty()) {
+                APIResourceListModel resourceList = new APIResourceListModel();
+
+                if (response.startsWith("[")) {
+                    JSONArray objects = new JSONArray(response);
+
+
+                    for (int i = 0; i < objects.length(); i++) {
+                        JSONObject pro = (JSONObject) objects.get(i);
+                        resourceList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
+                    }
+                } else {
+                    JSONObject object = new JSONObject(response);
+                    resourceList.addElement(new APIResource((String) object.get("id"), (String) object.get("name")));
+                }
+
+                return resourceList;
+            }
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-        if (rsp != null && rsp.getStatus() == 201) {
-            APIResourceListModel localesList = new APIResourceListModel();
-
-            JSONObject loc = rsp.getBody().getObject();
-            localesList.addElement(new APIResource((String) loc.get("id"), (String) loc.get("name")));
-
-            return localesList;
-        } else {
-            return null;
-        }
+        return null;
     }
 
 }
