@@ -1,4 +1,4 @@
-package com.phraseapp.androidstudio;
+package com.phraseapp.androidstudio.ui;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;

@@ -28,9 +28,9 @@
 
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.phraseapp.androidstudio.PhraseAppConfigurable"></applicationConfigurable>
+        <applicationConfigurable instance="com.phraseapp.androidstudio.ui.PhraseAppConfigurable"></applicationConfigurable>
         <toolWindow id="PhraseApp" anchor="right" icon="/phrase_13x13.png"
-                    factoryClass="com.phraseapp.androidstudio.PhraseAppToolWindow"></toolWindow>
+                    factoryClass="com.phraseapp.androidstudio.ui.PhraseAppToolWindow"></toolWindow>
     </extensions>
 
     <application-components>
@@ -43,23 +43,23 @@
 
     <actions>
         <group id="PhraseAppToolGroup" popup="true" text="PhraseApp" icon="/phrase_13x13.png"
-               class="com.phraseapp.androidstudio.PhraseAppToolGroup">
+               class="com.phraseapp.androidstudio.ui.PhraseAppToolGroup">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
 
         <action id="com.phraseapp.androidstudio.PhraseAppDownload"
-                class="com.phraseapp.androidstudio.DownloadButton" text="Download Locales"
+                class="com.phraseapp.androidstudio.ui.DownloadButton" text="Download Locales"
                 description="Download Locales from PhraseApp">
             <keyboard-shortcut keymap="$default" first-keystroke="shift control D"/>
             <add-to-group group-id="PhraseAppToolGroup" anchor="first"/>
         </action>
 
-        <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.UploadButton"
+        <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.ui.UploadButton"
                 text="Upload Locales" description="Upload Locales to PhraseApp">
             <keyboard-shortcut keymap="$default" first-keystroke="shift control U"/>
             <add-to-group group-id="PhraseAppToolGroup" />
         </action>
-        <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.WebButton"
+        <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.ui.WebButton"
                 text="PhraseApp Translation Center"
                 description="Open the PhraseApp Translation Center in your browser">
             <add-to-group group-id="PhraseAppToolGroup" anchor="last"/>

@@ -1,6 +1,5 @@
 package com.phraseapp.androidstudio;
 
-import com.apple.eawt.Application;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
@@ -15,6 +14,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
+import com.phraseapp.androidstudio.ui.ColorTextPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -143,7 +143,7 @@ public class ClientAdapter {
             Component[] components = viewport.getComponents();
             for (int i = 0; i < components.length; i++) {
 
-                if (components[i].getClass().getName().toString().equals("com.phraseapp.androidstudio.ColorTextPane")) {
+                if (components[i].getClass().getName().toString().equals("com.phraseapp.androidstudio.ui.ColorTextPane")) {
                     area = (ColorTextPane) components[i];
                 }
             }

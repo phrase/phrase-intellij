@@ -1,4 +1,4 @@
-package com.phraseapp.androidstudio;
+package com.phraseapp.androidstudio.ui;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataConstants;
@@ -9,6 +9,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.phraseapp.androidstudio.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

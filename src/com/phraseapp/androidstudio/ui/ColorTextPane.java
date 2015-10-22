@@ -1,4 +1,4 @@
-package com.phraseapp.androidstudio;
+package com.phraseapp.androidstudio.ui;
 
 import javax.swing.*;
 import javax.swing.text.*;
