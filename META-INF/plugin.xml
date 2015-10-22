@@ -64,7 +64,5 @@
                 description="Open the PhraseApp Translation Center in your browser">
             <add-to-group group-id="PhraseAppToolGroup" anchor="last"/>
         </action>
-
     </actions>
-
 </idea-plugin>
