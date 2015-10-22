@@ -28,7 +28,7 @@
 
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.phraseapp.androidstudio.ui.PhraseAppConfigurable"></applicationConfigurable>
+        <projectConfigurable groupId="tools" instance="com.phraseapp.androidstudio.ui.MyProjectConfigurable"></projectConfigurable>
         <toolWindow id="PhraseApp" anchor="right" icon="/phrase_13x13.png"
                     factoryClass="com.phraseapp.androidstudio.ui.PhraseAppToolWindow"></toolWindow>
     </extensions>
