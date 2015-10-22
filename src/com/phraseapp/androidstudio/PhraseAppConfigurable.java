@@ -92,11 +92,14 @@ public class PhraseAppConfigurable implements Configurable {
     private JPanel getCliPanel(){
         final JPanel cliPanel = new JPanel(new GridBagLayout());
 
-        String detected = ClientDetection.findClientInstallation();
-        if (detected != null) {
-            PropertiesRepository.getInstance().setClientPath(detected);
-            JOptionPane.showMessageDialog(cliPanel, "We found a PhraseApp client on your system: " + detected);
+        if (PropertiesRepository.getInstance().getClientPath() == null) {
+            String detected = ClientDetection.findClientInstallation();
+            if (detected != null) {
+                PropertiesRepository.getInstance().setClientPath(detected);
+                JOptionPane.showMessageDialog(cliPanel, "We found a PhraseApp client on your system: " + detected);
+            }
         }
+
 
         clientPathField = new TextFieldWithBrowseButton();
         final FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false) {
