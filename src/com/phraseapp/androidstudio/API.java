@@ -76,7 +76,6 @@ public class API {
         gcl.addParameter(accessToken);
 
         gcl.withWorkDirectory(workingDir);
-        System.out.printf(gcl.getCommandLineString());
         try {
             final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
             ProcessOutput output = processHandler.runProcess();
@@ -88,14 +87,15 @@ public class API {
                 if (response.startsWith("[")) {
                     JSONArray objects = new JSONArray(response);
 
-
                     for (int i = 0; i < objects.length(); i++) {
                         JSONObject pro = (JSONObject) objects.get(i);
                         resourceList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
                     }
-                } else {
+                } else if (response.startsWith("{")){
                     JSONObject object = new JSONObject(response);
                     resourceList.addElement(new APIResource((String) object.get("id"), (String) object.get("name")));
+                } else {
+                    return null;
                 }
 
                 return resourceList;

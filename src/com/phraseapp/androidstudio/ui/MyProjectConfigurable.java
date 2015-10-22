@@ -3,6 +3,7 @@ package com.phraseapp.androidstudio.ui;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
@@ -18,6 +19,8 @@ import org.yaml.snakeyaml.Yaml;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -46,6 +49,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private JPanel configPanel;
     private JPanel generatePanel;
     private JButton generateConfig;
+    private JCheckBox updateTranslationsCheckBox;
 
     public MyProjectConfigurable(Project project) {
         this.project = project;
@@ -68,6 +72,8 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     @Override
     public void reset() {
+        clientPathFormattedTextField.setText(PropertiesRepository.getInstance().getClientPath());
+        accessTokenTextField.setText(PropertiesRepository.getInstance().getAccessToken());
     }
 
     @Nullable
@@ -125,6 +131,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                     updateProjectSelect();
                 } else {
                     resetProjectSelect();
+                    resetLocaleSelect();
                 }
             }
         });
@@ -132,11 +139,19 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         projectsComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (projectsComboBox.getSelectedIndex() == -1) {
-                    defaultLocaleComboBox.setEnabled(false);
-                } else {
-                    updateLocaleSelect();
-                }
+                APIResource project = projects.getModelAt(
+                        projectsComboBox.getSelectedIndex());
+                projectId = project.getId();
+                updateLocaleSelect();
+            }
+        });
+
+        defaultLocaleComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent listSelectionEvent) {
+                APIResource locale = locales.getModelAt(
+                        defaultLocaleComboBox.getSelectedIndex());
+                localeId = locale.getId();
             }
         });
     }
@@ -144,7 +159,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     @Nls
     @Override
     public String getDisplayName() {
-        return "PhraseApp II";
+        return "PhraseApp";
     }
 
     @Override
@@ -224,6 +239,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private void resetProjectSelect() {
         projects = new APIResourceListModel();
         projectsComboBox.setModel(projects);
+        projectsComboBox.setEnabled(false);
     }
 
     private void updateProjectSelect() {
@@ -252,11 +268,14 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         }
     }
 
+    private void resetLocaleSelect() {
+        locales = new APIResourceListModel();
+        defaultLocaleComboBox.setModel(locales);
+        defaultLocaleComboBox.setEnabled(false);
+    }
+
     private void updateLocaleSelect() {
         API api = new API(accessTokenTextField.getText().trim(), project.getBasePath());
-        APIResource project = projects.getModelAt(
-                projectsComboBox.getSelectedIndex());
-        projectId = project.getId();
 
         if (!projectId.isEmpty()) {
             locales = api.getLocales(projectId);
@@ -293,10 +312,10 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         Map<String, String> pushParams = new HashMap<String, String>();
 
 
-//        if (updateTranslationsCheckbox.isSelected()) {
-//            pullParams.put("update_translations", true);
-//            pullFile.put("params", pullParams);
-//        }
+        if (updateTranslationsCheckBox.isSelected()) {
+            pullParams.put("update_translations", true);
+            pullFile.put("params", pullParams);
+        }
 
         pushParams.put("locale_id", localeId);
         pushFile.put("params", pushParams);
