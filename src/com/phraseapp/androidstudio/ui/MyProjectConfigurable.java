@@ -55,6 +55,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private JCheckBox updateTranslationsCheckBox;
     private JPanel clientPanel;
     private JTextPane infoPane;
+    private JTextPane configExistInfoText;
 
     public MyProjectConfigurable(Project project) {
         this.project = project;
@@ -84,20 +85,8 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     @Nullable
     @Override
     public JComponent createComponent() {
-        infoPane.setContentType( "text/html" );
-        infoPane.setEditable(false);
-        HTMLDocument doc = (HTMLDocument)infoPane.getDocument();
-        HTMLEditorKit editorKit = (HTMLEditorKit)infoPane.getEditorKit();
-        String text = "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>";
-        try {
-            editorKit.insertHTML(doc, doc.getLength(), text, 0, 0, null);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        initializeActions();
+        createHypertext(infoPane, "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
+        createHypertext(configExistInfoText, "We have detected an existing <a href=http://docs.phraseapp.com/developers/cli/configuration/>.phraseapp.yml</a> configuration file.");
 
         PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
         currentConfig = configuration.loadPhraseAppConfig();
@@ -119,7 +108,23 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         configPanel.setVisible(!configExists());
         generatePanel.setVisible(configExists());
 
+        initializeActions();
+
         return rootPanel;
+    }
+
+    private void createHypertext(JTextPane infoPane, String s) {
+        infoPane.setContentType("text/html");
+        HTMLDocument doc = (HTMLDocument) infoPane.getDocument();
+        HTMLEditorKit editorKit = (HTMLEditorKit) infoPane.getEditorKit();
+        String text = s;
+        try {
+            editorKit.insertHTML(doc, doc.getLength(), text, 0, 0, null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initializeActions() {
@@ -177,19 +182,23 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         projectsComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                APIResource project = projects.getModelAt(
-                        projectsComboBox.getSelectedIndex());
-                projectId = project.getId();
-                updateLocaleSelect();
+                if (e.getStateChange() == 1) {
+                    APIResource project = projects.getModelAt(
+                            projectsComboBox.getSelectedIndex());
+                    projectId = project.getId();
+                    updateLocaleSelect();
+                }
             }
         });
 
         defaultLocaleComboBox.addItemListener(new ItemListener() {
             @Override
-            public void itemStateChanged(ItemEvent listSelectionEvent) {
-                APIResource locale = locales.getModelAt(
-                        defaultLocaleComboBox.getSelectedIndex());
-                localeId = locale.getId();
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == 1) {
+                    APIResource locale = locales.getModelAt(
+                            defaultLocaleComboBox.getSelectedIndex());
+                    localeId = locale.getId();
+                }
             }
         });
     }
@@ -209,7 +218,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
         PropertiesRepository.getInstance().setClientPath(clientPathFormattedTextField.getText().trim());
 
-        if(configPanel.isEnabled()) {
+        if (configPanel.isEnabled()) {
             PropertiesRepository.getInstance().setAccessToken(accessTokenTextField.getText().trim());
 
             int genrateConfigChoice = JOptionPane.YES_OPTION;

@@ -65,6 +65,7 @@ public class API {
                 resource);
         gcl.addParameter(action);
 
+        System.out.printf("CLI: " + gcl.getCommandLineString());
         if (params != null) {
             gcl.addParameters(params);
         }
