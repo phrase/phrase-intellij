@@ -3,13 +3,9 @@ package com.phraseapp.androidstudio.ui;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
-import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
-import com.intellij.openapi.roots.ui.configuration.projectRoot.StructureConfigurableContext;
 import com.phraseapp.androidstudio.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -22,10 +18,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -128,6 +121,20 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void initializeActions() {
+        clientPathFormattedTextField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+
+            }
+
+            @Override
+            public void focusLost(FocusEvent focusEvent) {
+               if (! API.validateClient(clientPathFormattedTextField.getText().trim(), project.getBasePath())){
+                   JOptionPane.showMessageDialog(rootPanel, "PhraseApp Client validation failed. Please make sure it is installed correctly.");
+               }
+            }
+        });
+        
         infoPane.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent event) {
@@ -292,7 +299,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void updateProjectSelect() {
-        API api = new API(accessTokenTextField.getText().trim(), project.getBasePath());
+        API api = new API(clientPathFormattedTextField.getText().trim(), accessTokenTextField.getText().trim(), project.getBasePath());
         projects = api.getProjects();
 
         if (projects != null && projects.isEmpty()) {
@@ -324,7 +331,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void updateLocaleSelect() {
-        API api = new API(accessTokenTextField.getText().trim(), project.getBasePath());
+        API api = new API(clientPathFormattedTextField.getText().trim(), accessTokenTextField.getText().trim(), project.getBasePath());
 
         if (!projectId.isEmpty()) {
             locales = api.getLocales(projectId);

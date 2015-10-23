@@ -20,10 +20,12 @@ public class API {
 
     private final String accessToken;
     private final String workingDir;
+    private final String clientPath;
 
-    public API(String access_token, String basePath) {
+    public API(String clientPath, String access_token, String basePath) {
         this.accessToken = access_token;
         this.workingDir = basePath;
+        this.clientPath = clientPath;
     }
 
     // Get all locales
@@ -61,7 +63,7 @@ public class API {
 
     @Nullable
     private APIResourceListModel runCommand(String resource, String action, List<String> params) {
-        GeneralCommandLine gcl = new GeneralCommandLine(PropertiesRepository.getInstance().getClientPath(),
+        GeneralCommandLine gcl = new GeneralCommandLine(clientPath,
                 resource);
         gcl.addParameter(action);
 
@@ -103,4 +105,19 @@ public class API {
         return null;
     }
 
+    public static boolean validateClient(String path, String workingDir) {
+        GeneralCommandLine gcl = new GeneralCommandLine(path,
+                "info");
+        gcl.withWorkDirectory(workingDir);
+        final CapturingProcessHandler processHandler;
+        try {
+            processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
+            ProcessOutput output = processHandler.runProcess();
+            String response = output.getStdout();
+            return response.toLowerCase().contains("phraseapp client version");
+        } catch (ExecutionException e) {
+        }
+
+        return false;
+    }
 }
