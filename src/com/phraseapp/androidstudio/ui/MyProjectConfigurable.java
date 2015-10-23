@@ -17,14 +17,17 @@ import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,6 +53,8 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private JPanel generatePanel;
     private JButton generateConfig;
     private JCheckBox updateTranslationsCheckBox;
+    private JPanel clientPanel;
+    private JTextPane infoPane;
 
     public MyProjectConfigurable(Project project) {
         this.project = project;
@@ -67,7 +72,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     @Nullable
     @Override
     public String getHelpTopic() {
-        return null;
+        return "The PhraseApp plugin requires a installed PhraseApp CLI Client and a .phraseapp.yml configuration file";
     }
 
     @Override
@@ -79,6 +84,19 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     @Nullable
     @Override
     public JComponent createComponent() {
+        infoPane.setContentType( "text/html" );
+        infoPane.setEditable(false);
+        HTMLDocument doc = (HTMLDocument)infoPane.getDocument();
+        HTMLEditorKit editorKit = (HTMLEditorKit)infoPane.getEditorKit();
+        String text = "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>";
+        try {
+            editorKit.insertHTML(doc, doc.getLength(), text, 0, 0, null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         initializeActions();
 
         PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
@@ -105,6 +123,24 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void initializeActions() {
+        infoPane.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent event) {
+                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    try {
+                        Desktop.getDesktop().browse(event.getURL().toURI());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
+                    }
+                    ;
+                }
+            }
+        });
+
         generateConfig.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -173,22 +209,24 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
         PropertiesRepository.getInstance().setClientPath(clientPathFormattedTextField.getText().trim());
 
-        int genrateConfigChoice = JOptionPane.YES_OPTION;
-        if (configExists()) {
-            genrateConfigChoice = JOptionPane.showOptionDialog(null,
-                    "Should we generate a new .phraseap.yml with your current seetings?",
-                    "PhraseApp",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null, null, null);
-        }
+        if(configPanel.isEnabled()) {
+            PropertiesRepository.getInstance().setAccessToken(accessTokenTextField.getText().trim());
 
-        if (genrateConfigChoice == JOptionPane.YES_OPTION) {
-            PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
-            configuration.generateConfig(getConfigMap());
-        }
+            int genrateConfigChoice = JOptionPane.YES_OPTION;
+            if (configExists()) {
+                genrateConfigChoice = JOptionPane.showOptionDialog(null,
+                        "Should we generate a new .phraseap.yml with your current seetings?",
+                        "PhraseApp",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null, null, null);
+            }
 
-        PropertiesRepository.getInstance().setAccessToken(accessTokenTextField.getText().trim());
+            if (genrateConfigChoice == JOptionPane.YES_OPTION) {
+                PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
+                configuration.generateConfig(getConfigMap());
+            }
+        }
     }
 
     @Override

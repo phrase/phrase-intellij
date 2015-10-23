@@ -18,9 +18,6 @@ import java.util.List;
 
 public class API {
 
-    public static final String PHRASEAPP_VERSION = "2.3";
-    public static final String PHRASEAPP_API_BASEURL = "https://api.phraseapp.com/v2/";
-    public static final String PHRASEAPP_USER_AGENT = "PhraseApp AndroidStudio " + PHRASEAPP_VERSION;
     private final String accessToken;
     private final String workingDir;
 
@@ -80,7 +77,6 @@ public class API {
             final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
             ProcessOutput output = processHandler.runProcess();
             String response = output.getStdout();
-            System.out.printf(response);
             if (!response.isEmpty()) {
                 APIResourceListModel resourceList = new APIResourceListModel();
 
