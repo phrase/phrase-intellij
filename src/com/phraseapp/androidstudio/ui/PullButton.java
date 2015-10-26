@@ -4,9 +4,9 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
 /**
- * Catches DownloadButton-Click from MainMenu
+ * Catches PullButton-Click from MainMenu
  */
-public class DownloadButton extends AnAction {
+public class PullButton extends AnAction {
 
     public void actionPerformed(final AnActionEvent e) {
         ButtonEventHandler handler = new ButtonEventHandler();

@@ -47,14 +47,19 @@
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
 
-        <action id="com.phraseapp.androidstudio.PhraseAppDownload"
-                class="com.phraseapp.androidstudio.ui.DownloadButton" text="Download Locales"
+        <group id="PhraseAppPopUpToolGroup" popup="true" text="PhraseApp" icon="/phrase_13x13.png"
+               class="com.phraseapp.androidstudio.ui.PhraseAppPopUpToolGroup">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </group>
+
+        <action id="com.phraseapp.androidstudio.PhraseAppPull"
+                class="com.phraseapp.androidstudio.ui.PullButton" text="Download Locales"
                 description="Download Locales from PhraseApp">
             <keyboard-shortcut keymap="$default" first-keystroke="shift control D"/>
             <add-to-group group-id="PhraseAppToolGroup" anchor="first"/>
         </action>
 
-        <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.ui.UploadButton"
+        <action id="com.phraseapp.androidstudio.PhraseAppPush" class="com.phraseapp.androidstudio.ui.PushButton"
                 text="Upload Locales" description="Upload Locales to PhraseApp">
             <keyboard-shortcut keymap="$default" first-keystroke="shift control U"/>
             <add-to-group group-id="PhraseAppToolGroup" />
@@ -64,5 +69,11 @@
                 description="Open the PhraseApp Translation Center in your browser">
             <add-to-group group-id="PhraseAppToolGroup" anchor="last"/>
         </action>
+        <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.ui.UploadButton"
+                text="Upload Locale"
+                description="Upload Locale to PhraseApp">
+            <add-to-group group-id="PhraseAppPopUpToolGroup" anchor="last"/>
+        </action>
+
     </actions>
 </idea-plugin>
