@@ -51,12 +51,13 @@ public class API {
     }
 
     public APIResourceListModel postLocales(String projectId, String localeName) {
+        String localeCode = localeName.replaceFirst("-r", "-");
         List<String> params = new ArrayList<String>();
         params.add(projectId);
         params.add("--name");
         params.add(localeName);
         params.add("--code");
-        params.add(localeName);
+        params.add(localeCode);
         return runCommand("locale", "create", params);
     }
 
@@ -79,13 +80,16 @@ public class API {
                 resource);
         gcl.addParameter(action);
 
-        System.out.printf("CLI: " + gcl.getCommandLineString());
+
         if (params != null) {
             gcl.addParameters(params);
         }
 
         gcl.addParameter("--access-token");
         gcl.addParameter(accessToken);
+
+
+        System.out.printf("CLI: " + gcl.getCommandLineString() + "\n");
 
         gcl.withWorkDirectory(workingDir);
         try {
@@ -104,7 +108,12 @@ public class API {
                     }
                 } else if (response.startsWith("{")){
                     JSONObject object = new JSONObject(response);
-                    resourceList.addElement(new APIResource((String) object.get("id"), (String) object.get("name")));
+                    if(object.has("name")){
+                        resourceList.addElement(new APIResource((String) object.get("id"), (String) object.get("name")));
+
+                    }else{
+                        resourceList.addElement(new APIResource((String) object.get("id"), null));
+                    }
                 } else {
                     return null;
                 }

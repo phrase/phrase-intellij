@@ -22,9 +22,11 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.Book;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -285,6 +287,34 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     @Override
     public void apply() {
+        API api = new API(clientPathFormattedTextField.getText().trim(), accessTokenTextField.getText().trim(), project.getBasePath());
+        if(api.getLocales(projectId).getSize() < ProjectHelper.findProjectLocales(project.getBaseDir()).size()){
+            int uploadLocalesChoice = JOptionPane.showOptionDialog(null,
+                    "We found Locales in your Project that aren't in PhraseApp yet, upload them?",
+                    "PhraseApp",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, null, null);
+            if (uploadLocalesChoice == JOptionPane.YES_OPTION){
+                LinkedList<VirtualFile> localLocales = ProjectHelper.findProjectLocales(project.getBaseDir());
+                for(VirtualFile locale : localLocales){
+                    api.postLocales(
+                            projectId,
+                            ProjectHelper.getLocaleCode(locale)
+                    );
+                    api.uploadLocale(
+                          projectId,
+                          ProjectHelper.getLocaleCode(locale),
+                          locale.getPath(),
+                          "xml"
+                    );
+                    System.out.println(locale);
+                    System.out.println(locale.getPath());
+                    System.out.println(ProjectHelper.getLocaleCode(locale));
+                }
+            }
+        }
+
         if (clientPathFormattedTextField.getText().isEmpty()) {
             JOptionPane.showMessageDialog(rootPanel, "Please select the phraseapp client");
             return;
