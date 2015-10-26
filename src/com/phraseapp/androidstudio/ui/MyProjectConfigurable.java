@@ -3,9 +3,12 @@ package com.phraseapp.androidstudio.ui;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.phraseapp.androidstudio.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +41,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private APIResourceListModel locales = new APIResourceListModel();
 
     private JPanel rootPanel;
-    private JFormattedTextField clientPathFormattedTextField;
+    private TextFieldWithBrowseButton clientPathFormattedTextField;
     private JTextField accessTokenTextField;
     private JComboBox projectsComboBox;
     private JComboBox defaultLocaleComboBox;
@@ -49,6 +52,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private JPanel clientPanel;
     private JTextPane infoPane;
     private JTextPane configExistInfoText;
+    private boolean alreadyGeneratedConfig = false;
 
     public MyProjectConfigurable(Project project) {
         this.project = project;
@@ -71,13 +75,13 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     @Override
     public void reset() {
-        clientPathFormattedTextField.setText(PropertiesRepository.getInstance().getClientPath());
-        accessTokenTextField.setText(PropertiesRepository.getInstance().getAccessToken());
     }
 
     @Nullable
     @Override
     public JComponent createComponent() {
+        initializeActions();
+
         createHypertext(infoPane, "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
         createHypertext(configExistInfoText, "We have detected an existing <a href=http://docs.phraseapp.com/developers/cli/configuration/>.phraseapp.yml</a> configuration file.");
 
@@ -101,10 +105,13 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         configPanel.setVisible(!configExists());
         generatePanel.setVisible(configExists());
 
-        initializeActions();
+        if (API.validateClient(clientPathFormattedTextField.getText().trim(), project.getBasePath())){
+            enableClientRelatedFields();
+        }
 
         return rootPanel;
     }
+
 
     private void createHypertext(JTextPane infoPane, String s) {
         infoPane.setContentType("text/html");
@@ -121,35 +128,50 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void initializeActions() {
-        clientPathFormattedTextField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent focusEvent) {
+        final FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false) {
+            public boolean isFileSelectable(VirtualFile file) {
+                return file.getName().startsWith("phraseapp");
+            }
+        };
+        clientPathFormattedTextField.addBrowseFolderListener("Choose PhraseApp Client", "", null, fileChooserDescriptor);
 
+        JTextField clientPathTextField = clientPathFormattedTextField.getTextField();
+
+        clientPathTextField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                handleClientValidation();
             }
 
             @Override
-            public void focusLost(FocusEvent focusEvent) {
-               if (! API.validateClient(clientPathFormattedTextField.getText().trim(), project.getBasePath())){
-                   JOptionPane.showMessageDialog(rootPanel, "PhraseApp Client validation failed. Please make sure it is installed correctly.");
-               }
+            public void removeUpdate(DocumentEvent documentEvent) {
+                handleClientValidation();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+            }
+
+            private void handleClientValidation() {
+                if (API.validateClient(clientPathFormattedTextField.getText().trim(), project.getBasePath())) {
+                    enableClientRelatedFields();
+                } else {
+                    disableCLientRelatedFields();
+                }
             }
         });
 
         infoPane.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent event) {
-                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    try {
-                        Desktop.getDesktop().browse(event.getURL().toURI());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                        JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
-                    }
-                    ;
-                }
+                handleLinkClick(event);
+            }
+        });
+
+        configExistInfoText.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent event) {
+                handleLinkClick(event);
             }
         });
 
@@ -198,6 +220,20 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             }
         });
 
+        projectsComboBox.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                if (projects == null || projects.isEmpty()){
+                    updateProjectSelect();
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent focusEvent) {
+
+            }
+        });
+
         defaultLocaleComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -208,6 +244,37 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                 }
             }
         });
+    }
+
+    private void handleLinkClick(HyperlinkEvent event) {
+        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            try {
+                Desktop.getDesktop().browse(event.getURL().toURI());
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
+            }
+            ;
+        }
+    }
+
+    private void disableCLientRelatedFields() {
+        accessTokenTextField.setEnabled(false);
+        generateConfig.setEnabled(false);
+        updateTranslationsCheckBox.setEnabled(false);
+        projectsComboBox.setEnabled(false);
+        defaultLocaleComboBox.setEnabled(false);
+    }
+
+    private void enableClientRelatedFields() {
+        accessTokenTextField.setEnabled(true);
+        generateConfig.setEnabled(true);
+        updateTranslationsCheckBox.setEnabled(true);
+        projectsComboBox.setEnabled(true);
+        defaultLocaleComboBox.setEnabled(true);
     }
 
     @Nls
@@ -228,9 +295,14 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             return;
         }
 
+        if (projectId == null || localeId == null){
+            JOptionPane.showMessageDialog(rootPanel, "Please verify that you have entered a valida access token and selected a project and locale.");
+            return;
+        }
+
         PropertiesRepository.getInstance().setClientPath(clientPathFormattedTextField.getText().trim());
 
-        if (configPanel.isEnabled()) {
+        if (configPanel.isVisible() && !alreadyGeneratedConfig) {
             PropertiesRepository.getInstance().setAccessToken(accessTokenTextField.getText().trim());
 
             int genrateConfigChoice = JOptionPane.YES_OPTION;
@@ -244,6 +316,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             }
 
             if (genrateConfigChoice == JOptionPane.YES_OPTION) {
+                alreadyGeneratedConfig = true;
                 PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
                 configuration.generateConfig(getConfigMap());
             }
@@ -298,6 +371,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void resetProjectSelect() {
+        projectId = null;
         projects = new APIResourceListModel();
         projectsComboBox.setModel(projects);
         projectsComboBox.setEnabled(false);
@@ -307,29 +381,36 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         API api = new API(clientPathFormattedTextField.getText().trim(), accessTokenTextField.getText().trim(), project.getBasePath());
         projects = api.getProjects();
 
-        if (projects != null && projects.isEmpty()) {
-            int choice = JOptionPane.showOptionDialog(null,
-                    "No projects found. Should we create an initial project for you?",
-                    "PhraseApp",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null, null, null);
-            if (choice == JOptionPane.YES_OPTION) {
-                projects = api.postProjects(getProject().getName());
-            }
-        }
-
         if (projects != null) {
+            if (projects.isEmpty()) {
+                int choice = JOptionPane.showOptionDialog(null,
+                        "No projects found. Should we create an initial project for you?",
+                        "PhraseApp",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null, null, null);
+                if (choice == JOptionPane.YES_OPTION) {
+                    projects = api.postProjects(getProject().getName());
+                }
+            }
             projectsComboBox.setModel(projects);
-            projectsComboBox.setSelectedIndex(0);
             projectsComboBox.setEnabled(true);
+
+            if(projects.isEmpty()) {
+                resetLocaleSelect();
+            } else {
+                projectsComboBox.setSelectedIndex(0);
+            }
+
         } else {
+            resetLocaleSelect();
             projectsComboBox.setEnabled(false);
             JOptionPane.showMessageDialog(rootPanel, "The access_token is not valid. Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
         }
     }
 
     private void resetLocaleSelect() {
+        localeId = null;
         locales = new APIResourceListModel();
         defaultLocaleComboBox.setModel(locales);
         defaultLocaleComboBox.setEnabled(false);
