@@ -3,6 +3,7 @@ package com.phraseapp.androidstudio;
 import java.util.LinkedList;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VFileProperty;
+import com.intellij.openapi.vfs.VirtualFileAdapter;
 
 
 /**
@@ -22,13 +23,13 @@ public class ProjectHelper {
         }
     }
 
-    public static LinkedList<String> findProjectLocales(VirtualFile resDir) {
-        LinkedList<String> locales = new LinkedList<String>();
+    public static LinkedList<VirtualFile> findProjectLocales(VirtualFile resDir) {
+        LinkedList<VirtualFile> locales = new LinkedList<VirtualFile>();
         LinkedList<VirtualFile> fileList = new LinkedList<VirtualFile>();
         smartVisit(resDir, fileList);
         for (VirtualFile file : fileList) {
             if (isLocaleFile(file)) {
-                locales.add(file.getPath());
+                locales.add(file);
             }
         }
         return locales;
