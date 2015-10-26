@@ -134,7 +134,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                }
             }
         });
-        
+
         infoPane.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent event) {
@@ -220,6 +220,11 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     public void apply() {
         if (clientPathFormattedTextField.getText().isEmpty()) {
             JOptionPane.showMessageDialog(rootPanel, "Please select the phraseapp client");
+            return;
+        }
+
+        if (! API.validateClient(clientPathFormattedTextField.getText().trim(), project.getBasePath())){
+            JOptionPane.showMessageDialog(rootPanel, "PhraseApp Client validation failed. Please make sure it is installed correctly.");
             return;
         }
 

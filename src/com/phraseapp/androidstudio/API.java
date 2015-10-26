@@ -35,7 +35,6 @@ public class API {
         return runCommand("locales", "list", params);
     }
 
-
     // Get all projects
     public APIResourceListModel getProjects() {
         return runCommand("projects", "list", null);
