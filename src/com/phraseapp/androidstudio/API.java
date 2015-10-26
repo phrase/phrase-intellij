@@ -60,6 +60,19 @@ public class API {
         return runCommand("locale", "create", params);
     }
 
+
+    public APIResourceListModel uploadLocale(String projectId, String localeId, String file, String fileformat){
+        List<String> params = new ArrayList<String>();
+        params.add(projectId);
+        params.add("--locale-id");
+        params.add(localeId);
+        params.add("--file");
+        params.add(file);
+        params.add("--file-format");
+        params.add(fileformat);
+        return runCommand("upload", "create", params);
+    }
+
     @Nullable
     private APIResourceListModel runCommand(String resource, String action, List<String> params) {
         GeneralCommandLine gcl = new GeneralCommandLine(clientPath,
