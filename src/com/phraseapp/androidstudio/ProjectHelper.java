@@ -53,7 +53,7 @@ public class ProjectHelper {
     }
 
     public static boolean isLocaleFile(VirtualFile file) {
-        return file.getPath().contains("res/values-") && file.getName().equals("strings.xml");
+        return file.getPath().contains("src/main/res/values-") && file.getName().equals("strings.xml");
     }
 
 }
