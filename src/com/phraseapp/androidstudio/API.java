@@ -4,15 +4,14 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,9 +21,9 @@ public class API {
     private final String workingDir;
     private final String clientPath;
 
-    public API(String clientPath, String access_token, String basePath) {
+    public API(String clientPath, String access_token, Project project) {
         this.accessToken = access_token;
-        this.workingDir = basePath;
+        this.workingDir = project.getBasePath();
         this.clientPath = clientPath;
     }
 
@@ -62,7 +61,7 @@ public class API {
     }
 
 
-    public APIResourceListModel uploadLocale(String projectId, String localeId, String file, String fileformat){
+    public APIResourceListModel uploadLocale(String projectId, String localeId, String file, String fileformat) {
         List<String> params = new ArrayList<String>();
         params.add(projectId);
         params.add("--locale-id");
@@ -76,6 +75,7 @@ public class API {
 
     @Nullable
     private APIResourceListModel runCommand(String resource, String action, List<String> params) {
+
         GeneralCommandLine gcl = new GeneralCommandLine(clientPath,
                 resource);
         gcl.addParameter(action);
@@ -87,41 +87,57 @@ public class API {
 
         gcl.addParameter("--access-token");
         gcl.addParameter(accessToken);
-
-
-        System.out.printf("CLI: " + gcl.getCommandLineString() + "\n");
-
         gcl.withWorkDirectory(workingDir);
+
         try {
             final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
+
             ProcessOutput output = processHandler.runProcess();
-            String response = output.getStdout();
-            if (!response.isEmpty()) {
-                APIResourceListModel resourceList = new APIResourceListModel();
+            final String response = output.getStdout();
+            String error = output.getStderr();
+            APIResourceListModel resources = handleResponse(response);
 
-                if (response.startsWith("[")) {
-                    JSONArray objects = new JSONArray(response);
-
-                    for (int i = 0; i < objects.length(); i++) {
-                        JSONObject pro = (JSONObject) objects.get(i);
-                        resourceList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
-                    }
-                } else if (response.startsWith("{")){
-                    JSONObject object = new JSONObject(response);
-                    if(object.has("name")){
-                        resourceList.addElement(new APIResource((String) object.get("id"), (String) object.get("name")));
-
-                    }else{
-                        resourceList.addElement(new APIResource((String) object.get("id"), null));
-                    }
-                } else {
-                    return null;
-                }
-
-                return resourceList;
-            }
+            return resources;
         } catch (ExecutionException e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String getCommandString(String resource, String action, List<String> params) {
+        String string = "phraseapp " + resource + " " + action;
+        if( params != null){
+            string += " " + StringUtil.join(params, " ");
+        }
+
+        return string;
+    }
+
+
+    private APIResourceListModel handleResponse(String response) {
+        if (!response.isEmpty()) {
+            APIResourceListModel resourceList = new APIResourceListModel();
+
+            if (response.startsWith("[")) {
+                JSONArray objects = new JSONArray(response);
+
+                for (int i = 0; i < objects.length(); i++) {
+                    JSONObject pro = (JSONObject) objects.get(i);
+                    resourceList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
+                }
+            } else if (response.startsWith("{")) {
+                JSONObject object = new JSONObject(response);
+                if (object.has("name")) {
+                    resourceList.addElement(new APIResource((String) object.get("id"), (String) object.get("name")));
+
+                } else {
+                    resourceList.addElement(new APIResource((String) object.get("id"), null));
+                }
+            } else {
+                return null;
+            }
+
+            return resourceList;
         }
         return null;
     }
@@ -141,4 +157,6 @@ public class API {
 
         return false;
     }
+
+
 }

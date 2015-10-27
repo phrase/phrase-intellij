@@ -5,7 +5,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.phraseapp.androidstudio.ClientAdapter;
+import com.phraseapp.androidstudio.PushPullAdapter;
 import com.phraseapp.androidstudio.PhraseAppConfiguration;
 import com.phraseapp.androidstudio.PropertiesRepository;
 
@@ -29,7 +29,7 @@ public class ButtonEventHandler {
             return;
         }
 
-        ClientAdapter phraseAppClient = new ClientAdapter(clientPath, project);
+        PushPullAdapter phraseAppClient = new PushPullAdapter(clientPath, project);
         phraseAppClient.run(clientAction);
     }
 }

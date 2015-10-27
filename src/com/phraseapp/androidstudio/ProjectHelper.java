@@ -1,6 +1,11 @@
 package com.phraseapp.androidstudio;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
+
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VFileProperty;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
@@ -35,9 +40,16 @@ public class ProjectHelper {
         return locales;
     }
 
-    public static String getLocaleCode(VirtualFile file) {
-        String localecode[] = file.getParent().getName().split("-");
-        return localecode.length == 3 ? localecode[1] + "-" + localecode[2] : localecode[1];
+    public static String getLocaleName(VirtualFile file) {
+        String name = file.getParent().getName();
+        String[] parts = name.split("-");
+        if (parts.length <= 1) {
+            return "";
+        }
+
+        ArrayList<String> list = new ArrayList<String>(Arrays.asList(parts));
+        List<String> sublist = list.subList(1, list.size());
+        return StringUtil.join(sublist, "-");
     }
 
     public static boolean isLocaleFile(VirtualFile file) {

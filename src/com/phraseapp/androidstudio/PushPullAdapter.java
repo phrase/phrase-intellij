@@ -27,34 +27,34 @@ import java.util.Date;
 /**
  * Created by kolja on 15.10.15.
  */
-public class ClientAdapter {
+public class PushPullAdapter {
     private String clientPath;
     private String projectPath;
-    private ToolWindow outputWindow;
+    private ToolWindowHelper outputWindowHelper;
     private SimpleDateFormat sdf;
 
-    public ClientAdapter(final String path, Project project) {
+    public PushPullAdapter(final String path, Project project) {
         clientPath = path;
         projectPath = project.getBasePath();
-        outputWindow = ToolWindowManager.getInstance(project).getToolWindow("PhraseApp");
+        outputWindowHelper = new ToolWindowHelper(project);
         sdf = new SimpleDateFormat("HH:mm:ss");
     }
 
     public void run(final String clientAction) {
 
-        if (outputWindow.isActive()) {
-            final ColorTextPane finalArea = getColorTextPane();
-            outputWindow.show(new Runnable() {
+        if (outputWindowHelper.getOutputWindow().isActive()) {
+            final ColorTextPane finalArea = outputWindowHelper.getColorTextPane();
+            outputWindowHelper.getOutputWindow().show(new Runnable() {
                 @Override
                 public void run() {
                     runCommand(clientAction, finalArea);
                 }
             });
         } else {
-            outputWindow.activate(new Runnable() {
+            outputWindowHelper.getOutputWindow().activate(new Runnable() {
                 @Override
                 public void run() {
-                    runCommand(clientAction, getColorTextPane());
+                    runCommand(clientAction, outputWindowHelper.getColorTextPane());
                 }
             });
         }
@@ -130,24 +130,5 @@ public class ClientAdapter {
     @NotNull
     private String getFormattedTime() {
         return sdf.format(new Date()) + " ";
-    }
-
-    @Nullable
-    private ColorTextPane getColorTextPane() {
-        final Content content = outputWindow.getContentManager().getContent(0);
-        ColorTextPane area = null;
-        if (content != null) {
-
-            JScrollPane pane = (JScrollPane) content.getComponent();
-            JViewport viewport = pane.getViewport();
-            Component[] components = viewport.getComponents();
-            for (int i = 0; i < components.length; i++) {
-
-                if (components[i].getClass().getName().toString().equals("com.phraseapp.androidstudio.ui.ColorTextPane")) {
-                    area = (ColorTextPane) components[i];
-                }
-            }
-        }
-        return area;
     }
 }

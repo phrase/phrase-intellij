@@ -3,13 +3,14 @@ package com.phraseapp.androidstudio.ui;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.phraseapp.androidstudio.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by kolja on 26.10.15.
@@ -25,22 +26,41 @@ public class UploadButton extends AnAction {
     }
 
     private static boolean isStringsFile(@Nullable VirtualFile file) {
-        return file != null && file.getName().equals("strings.xml");
+        return file != null && file.getName().equals("strings.xml") && !ProjectHelper.getLocaleName(file).isEmpty();
     }
 
     @Override
-    public void actionPerformed(AnActionEvent e) {
+    public void actionPerformed(final AnActionEvent e) {
         final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
-        String name = file.getParent().getName();
-        String[] parts = name.split("-");
-        if (parts.length <= 1) {
-            return;
-        }
+        final String localeName = ProjectHelper.getLocaleName(file);
+        final ToolWindowOutputWriter outputWriter = new ToolWindowOutputWriter(e.getProject());
+        outputWriter.writeOutput("Started Uploading locale: " + localeName);
 
-        ArrayList<String> list = new ArrayList<String>(Arrays.asList(parts));
-        List<String> sublist = list.subList(1, list.size());
-        String localeName = StringUtil.join(sublist, "-");
-        System.out.printf(localeName);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final API api = new API(PropertiesRepository.getInstance().getClientPath(), PropertiesRepository.getInstance().getAccessToken(), e.getProject());
+
+                api.postLocales(PropertiesRepository.getInstance().getProjectId(), localeName);
+                APIResourceListModel upload = api.uploadLocale(
+                        PropertiesRepository.getInstance().
+
+                                getProjectId(),
+
+                        ProjectHelper.getLocaleName(file),
+                        file.getPath(),
+                        "xml"
+                );
+
+                if (upload != null) {
+                    outputWriter.writeOutput("Finished");
+                } else {
+                    outputWriter.writeOutput("Failed!");
+                }
+            }
+        });
+
+        thread.start();
     }
 
 }

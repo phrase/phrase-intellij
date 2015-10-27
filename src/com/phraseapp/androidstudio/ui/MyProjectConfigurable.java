@@ -8,6 +8,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.phraseapp.androidstudio.*;
 import org.jetbrains.annotations.Nls;
@@ -22,13 +23,9 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.print.Book;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by gfrey on 22/10/15.
@@ -90,9 +87,9 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
         currentConfig = configuration.loadPhraseAppConfig();
 
-        if(PropertiesRepository.getInstance().getClientPath() == null){
+        if (PropertiesRepository.getInstance().getClientPath() == null) {
             String detected = ClientDetection.findClientInstallation();
-            if(detected != null){
+            if (detected != null) {
                 PropertiesRepository.getInstance().setClientPath(detected);
                 JOptionPane.showMessageDialog(rootPanel, "We found a PhraseApp client on your system: " + detected);
             }
@@ -101,13 +98,13 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         String clientPath = PropertiesRepository.getInstance().getClientPath();
         clientPathFormattedTextField.setText(clientPath);
 
-        String accessToken = getAccessToken();
+        String accessToken = getAccessTokenFromConfig();
         accessTokenTextField.setText(accessToken);
 
         configPanel.setVisible(!configExists());
         generatePanel.setVisible(configExists());
 
-        if (API.validateClient(clientPathFormattedTextField.getText().trim(), project.getBasePath())){
+        if (API.validateClient(getClientPath(), project.getBasePath())) {
             enableClientRelatedFields();
         }
 
@@ -155,7 +152,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             }
 
             private void handleClientValidation() {
-                if (API.validateClient(clientPathFormattedTextField.getText().trim(), project.getBasePath())) {
+                if (API.validateClient(getClientPath(), project.getBasePath())) {
                     enableClientRelatedFields();
                 } else {
                     disableCLientRelatedFields();
@@ -225,7 +222,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         projectsComboBox.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent focusEvent) {
-                if (projects == null || projects.isEmpty()){
+                if (projects == null || projects.isEmpty()) {
                     updateProjectSelect();
                 }
             }
@@ -287,53 +284,26 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     @Override
     public void apply() {
-        API api = new API(clientPathFormattedTextField.getText().trim(), accessTokenTextField.getText().trim(), project.getBasePath());
-        // Check if we have more local Locales than remote
-        if(api.getLocales(projectId).getSize() < ProjectHelper.findProjectLocales(project.getBaseDir()).size()){
-            int uploadLocalesChoice = JOptionPane.showOptionDialog(null,
-                    "We found Locales in your Project that aren't in PhraseApp yet, upload them?",
-                    "PhraseApp",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null, null, null);
-            if (uploadLocalesChoice == JOptionPane.YES_OPTION){
-                LinkedList<VirtualFile> localLocales = ProjectHelper.findProjectLocales(project.getBaseDir());
-                for(VirtualFile locale : localLocales){
-                    // Create Locale
-                    api.postLocales(
-                            projectId,
-                            ProjectHelper.getLocaleCode(locale)
-                    );
-                    // Upload Locale
-                    api.uploadLocale(
-                          projectId,
-                          ProjectHelper.getLocaleCode(locale),
-                          locale.getPath(),
-                          "xml"
-                    );
-                }
-            }
-        }
-
         if (clientPathFormattedTextField.getText().isEmpty()) {
             JOptionPane.showMessageDialog(rootPanel, "Please select the phraseapp client");
             return;
         }
 
-        if (! API.validateClient(clientPathFormattedTextField.getText().trim(), project.getBasePath())){
+        if (!API.validateClient(getClientPath(), project.getBasePath())) {
             JOptionPane.showMessageDialog(rootPanel, "PhraseApp Client validation failed. Please make sure it is installed correctly.");
             return;
         }
 
-        if (projectId == null || localeId == null){
+        if (projectId == null || localeId == null) {
             JOptionPane.showMessageDialog(rootPanel, "Please verify that you have entered a valida access token and selected a project and locale.");
             return;
         }
 
-        PropertiesRepository.getInstance().setClientPath(clientPathFormattedTextField.getText().trim());
+        PropertiesRepository.getInstance().setClientPath(getClientPath());
 
         if (configPanel.isVisible() && !alreadyGeneratedConfig) {
-            PropertiesRepository.getInstance().setAccessToken(accessTokenTextField.getText().trim());
+            PropertiesRepository.getInstance().setAccessToken(getAccessToken());
+            PropertiesRepository.getInstance().setProjectId(projectId);
 
             int genrateConfigChoice = JOptionPane.YES_OPTION;
             if (configExists()) {
@@ -349,6 +319,59 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                 alreadyGeneratedConfig = true;
                 PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
                 configuration.generateConfig(getConfigMap());
+            }
+        }
+
+        final API api = new API(getClientPath(), getAccessToken(), project);
+        // Check if we have more local Locales than remote
+        APIResourceListModel remoteLocales = api.getLocales(projectId);
+
+        final ArrayList<String> remoteLocaleNames = new ArrayList<String>();
+        for (int i = 0; i < remoteLocales.getSize(); i++) {
+            remoteLocaleNames.add(remoteLocales.getModelAt(i).getName());
+        }
+
+        final ToolWindowOutputWriter outputWriter = new ToolWindowOutputWriter(project);
+        int uploadLocalesChoice = JOptionPane.showOptionDialog(null,
+                "We found Locales in your Project that aren't in PhraseApp yet, upload them?",
+                "PhraseApp",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null, null, null);
+        if (uploadLocalesChoice == JOptionPane.YES_OPTION) {
+            final LinkedList<VirtualFile> localLocales = ProjectHelper.findProjectLocales(project.getBaseDir());
+            outputWriter.writeOutput("Started Uploading missing locales ...");
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    uploadLocales(api, localLocales, remoteLocaleNames, outputWriter);
+                    outputWriter.writeOutput("Finished");
+                }
+            });
+            thread.start();
+        }
+
+    }
+
+    private void uploadLocales(API api, LinkedList<VirtualFile> localLocales, ArrayList<String> remoteLocaleNames, ToolWindowOutputWriter outputWriter) {
+        for (VirtualFile locale : localLocales) {
+            String localeName = ProjectHelper.getLocaleName(locale);
+
+            if (! remoteLocaleNames.contains(localeName)) {
+                // Create Locale
+                locales = api.postLocales(
+                        projectId,
+                        localeName
+                );
+                // Upload Locale
+                api.uploadLocale(
+                        projectId,
+                        localeName,
+                        locale.getPath(),
+                        "xml"
+                );
+                outputWriter.writeOutput("Uploaded locale: " + localeName);
             }
         }
     }
@@ -381,7 +404,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         return project;
     }
 
-    private String getAccessToken() {
+    private String getAccessTokenFromConfig() {
         String accessToken = null;
 
         if (configExists()) {
@@ -408,7 +431,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void updateProjectSelect() {
-        API api = new API(clientPathFormattedTextField.getText().trim(), accessTokenTextField.getText().trim(), project.getBasePath());
+        API api = new API(getClientPath(), getAccessToken(), project);
         projects = api.getProjects();
 
         if (projects != null) {
@@ -426,7 +449,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             projectsComboBox.setModel(projects);
             projectsComboBox.setEnabled(true);
 
-            if(projects.isEmpty()) {
+            if (projects.isEmpty()) {
                 resetLocaleSelect();
             } else {
                 projectsComboBox.setSelectedIndex(0);
@@ -447,7 +470,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void updateLocaleSelect() {
-        API api = new API(clientPathFormattedTextField.getText().trim(), accessTokenTextField.getText().trim(), project.getBasePath());
+        API api = new API(getClientPath(), getAccessToken(), project);
 
         if (!projectId.isEmpty()) {
             locales = api.getLocales(projectId);
@@ -501,7 +524,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         root.put("push", push);
         root.put("pull", pull);
         root.put("project_id", projectId);
-        root.put("access_token", accessTokenTextField.getText().trim());
+        root.put("access_token", getAccessToken());
         root.put("file_format", "xml");
 
         base.put("phraseapp", root);
@@ -516,6 +539,16 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     private String getPullPath(String defaultLocalePath) {
         return defaultLocalePath.replaceAll("values", "values-<locale_name>");
+    }
+
+    @NotNull
+    private String getAccessToken() {
+        return accessTokenTextField.getText().trim();
+    }
+
+    @NotNull
+    private String getClientPath() {
+        return clientPathFormattedTextField.getText().trim();
     }
 }
 
