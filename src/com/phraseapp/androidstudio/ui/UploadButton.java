@@ -34,7 +34,7 @@ public class UploadButton extends AnAction {
         final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
         final String localeName = ProjectHelper.getLocaleName(file);
         final ToolWindowOutputWriter outputWriter = new ToolWindowOutputWriter(e.getProject());
-        outputWriter.writeOutput("Started Uploading locale: " + localeName);
+        outputWriter.writeOutput("Started Uploading locale: " + ColorTextPane.ANSI_GREEN + localeName + ColorTextPane.ANSI_STOP);
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -53,7 +53,7 @@ public class UploadButton extends AnAction {
                 );
 
                 if (upload != null && !upload.isValid()) {
-                    outputWriter.writeOutput(upload.getErrors());
+                    outputWriter.writeOutput(ColorTextPane.ANSI_RED + upload.getErrors() + ColorTextPane.ANSI_STOP);
                 }
 
                 outputWriter.writeOutput("Finished");

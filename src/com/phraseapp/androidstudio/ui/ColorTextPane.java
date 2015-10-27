@@ -7,6 +7,12 @@ import java.awt.Color;
 public class ColorTextPane extends JTextPane {
     static final Color D_Black   = Color.getHSBColor( 0.000f, 0.000f, 0.000f );
     static final Color D_Green   = Color.getHSBColor(0.333f, 1.000f, 0.502f);
+    static final Color D_Red = Color.getHSBColor(0.000f, 1.000f, 0.502f);
+
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_GREEN = "\u001B[0;32;1m";
+    public static final String ANSI_STOP = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[0;31m";;
     static Color colorCurrent    = D_Black;
     String remaining = "";
 
@@ -74,9 +80,10 @@ public class ColorTextPane extends JTextPane {
     }
 
     public Color getANSIColor(String ANSIColor) {
-        if (ANSIColor.equals("\u001B[30m"))        { return D_Black; }
-        else if (ANSIColor.equals("\u001B[0;32;1m")) { return D_Green; }
-        else if (ANSIColor.equals("\u001B[0m"))    { return D_Black; }
+        if (ANSIColor.equals(ANSI_BLACK))        { return D_Black; }
+        else if (ANSIColor.equals(ANSI_GREEN)) { return D_Green; }
+        else if (ANSIColor.equals(ANSI_RED)) { return D_Red; }
+        else if (ANSIColor.equals(ANSI_STOP))    { return D_Black; }
         else { return D_Black; }
     }
 }

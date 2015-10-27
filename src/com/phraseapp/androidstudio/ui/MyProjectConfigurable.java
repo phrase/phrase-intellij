@@ -374,9 +374,9 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
                 if (upload != null) {
                     if (!upload.isValid()) {
-                        outputWriter.writeOutput("Could not upload locale: " + localeName + "\n" + upload.getErrors());
+                        outputWriter.writeOutput("Could not upload locale: " + localeName + "\n" + ColorTextPane.ANSI_RED + upload.getErrors() + ColorTextPane.ANSI_STOP);
                     } else {
-                        outputWriter.writeOutput("Uploaded locale: " + localeName);
+                        outputWriter.writeOutput("Uploaded locale: " + ColorTextPane.ANSI_GREEN + localeName + ColorTextPane.ANSI_STOP);
                     }
                 } else {
                     outputWriter.writeOutput("Could not upload locale: " + localeName);

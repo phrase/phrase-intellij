@@ -40,10 +40,6 @@ public class ToolWindowHelper {
         return area;
     }
 
-    public boolean isActive(){
-        return outputWindow.isActive();
-    }
-
     public ToolWindow getOutputWindow() {
         return outputWindow;
     }
