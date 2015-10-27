@@ -39,7 +39,7 @@ public class UploadButton extends AnAction {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                final API api = new API(PropertiesRepository.getInstance().getClientPath(), PropertiesRepository.getInstance().getAccessToken(), e.getProject());
+                final API api = new API(PropertiesRepository.getInstance().getClientPath(), "123", e.getProject());
 
                 api.postLocales(PropertiesRepository.getInstance().getProjectId(), localeName);
                 APIResourceListModel upload = api.uploadLocale(
@@ -52,11 +52,11 @@ public class UploadButton extends AnAction {
                         "xml"
                 );
 
-                if (upload != null) {
-                    outputWriter.writeOutput("Finished");
-                } else {
-                    outputWriter.writeOutput("Failed!");
+                if (upload != null && !upload.isValid()) {
+                    outputWriter.writeOutput(upload.getErrors());
                 }
+
+                outputWriter.writeOutput("Finished");
             }
         });
 

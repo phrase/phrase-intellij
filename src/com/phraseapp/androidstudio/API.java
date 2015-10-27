@@ -93,8 +93,15 @@ public class API {
             final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
 
             ProcessOutput output = processHandler.runProcess();
-            final String response = output.getStdout();
             String error = output.getStderr();
+
+            if(!error.isEmpty()){
+                APIResourceListModel resourceList = new APIResourceListModel();
+                resourceList.addError(error);
+                return resourceList;
+            }
+
+            final String response = output.getStdout();
             APIResourceListModel resources = handleResponse(response);
 
             return resources;
@@ -103,16 +110,6 @@ public class API {
         }
         return null;
     }
-
-    private String getCommandString(String resource, String action, List<String> params) {
-        String string = "phraseapp " + resource + " " + action;
-        if( params != null){
-            string += " " + StringUtil.join(params, " ");
-        }
-
-        return string;
-    }
-
 
     private APIResourceListModel handleResponse(String response) {
         if (!response.isEmpty()) {

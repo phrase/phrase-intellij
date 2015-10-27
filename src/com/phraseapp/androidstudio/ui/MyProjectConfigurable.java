@@ -358,20 +358,29 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         for (VirtualFile locale : localLocales) {
             String localeName = ProjectHelper.getLocaleName(locale);
 
-            if (! remoteLocaleNames.contains(localeName)) {
+            if (!remoteLocaleNames.contains(localeName)) {
                 // Create Locale
                 locales = api.postLocales(
                         projectId,
                         localeName
                 );
                 // Upload Locale
-                api.uploadLocale(
+                APIResourceListModel upload = api.uploadLocale(
                         projectId,
                         localeName,
                         locale.getPath(),
                         "xml"
                 );
-                outputWriter.writeOutput("Uploaded locale: " + localeName);
+
+                if (upload != null) {
+                    if (!upload.isValid()) {
+                        outputWriter.writeOutput("Could not upload locale: " + localeName + "\n" + upload.getErrors());
+                    } else {
+                        outputWriter.writeOutput("Uploaded locale: " + localeName);
+                    }
+                } else {
+                    outputWriter.writeOutput("Could not upload locale: " + localeName);
+                }
             }
         }
     }
