@@ -79,28 +79,14 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     @Nullable
     @Override
     public JComponent createComponent() {
+        loadExistingConfig();
         initializeActions();
-
+        detectAndSetClientPath();
         createHypertext(infoPane, "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
         createHypertext(configExistInfoText, "We have detected an existing <a href=http://docs.phraseapp.com/developers/cli/configuration/>.phraseapp.yml</a> configuration file.");
 
-        PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
-        currentConfig = configuration.loadPhraseAppConfig();
-
-        if (PropertiesRepository.getInstance().getClientPath() == null) {
-            String detected = ClientDetection.findClientInstallation();
-            if (detected != null) {
-                PropertiesRepository.getInstance().setClientPath(detected);
-                JOptionPane.showMessageDialog(rootPanel, "We found a PhraseApp client on your system: " + detected);
-            }
-        }
-
-        String clientPath = PropertiesRepository.getInstance().getClientPath();
-        clientPathFormattedTextField.setText(clientPath);
-
-        String accessToken = getAccessTokenFromConfig();
-        accessTokenTextField.setText(accessToken);
-
+        clientPathFormattedTextField.setText(PropertiesRepository.getInstance().getClientPath());
+        accessTokenTextField.setText(getAccessTokenFromConfig());
         configPanel.setVisible(!configExists());
         generatePanel.setVisible(configExists());
 
@@ -109,6 +95,21 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         }
 
         return rootPanel;
+    }
+
+    private void detectAndSetClientPath() {
+        if (PropertiesRepository.getInstance().getClientPath() == null) {
+            String detected = ClientDetection.findClientInstallation();
+            if (detected != null) {
+                PropertiesRepository.getInstance().setClientPath(detected);
+                JOptionPane.showMessageDialog(rootPanel, "We found a PhraseApp client on your system: " + detected);
+            }
+        }
+    }
+
+    private void loadExistingConfig() {
+        PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
+        currentConfig = configuration.loadPhraseAppConfig();
     }
 
 
@@ -135,7 +136,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         clientPathFormattedTextField.addBrowseFolderListener("Choose PhraseApp Client", "", null, fileChooserDescriptor);
 
         JTextField clientPathTextField = clientPathFormattedTextField.getTextField();
-
         clientPathTextField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -166,7 +166,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                 handleLinkClick(event);
             }
         });
-
         configExistInfoText.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent event) {
@@ -512,15 +511,12 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         Map<String, Object> push = new HashMap<String, Object>();
         Map<String, Object> pullFile = new HashMap<String, Object>();
         Map<String, Object> pushFile = new HashMap<String, Object>();
-        Map<String, Boolean> pullParams = new HashMap<String, Boolean>();
-        Map<String, String> pushParams = new HashMap<String, String>();
+        Map<String, Object> pushParams = new HashMap<String, Object>();
 
 
         if (updateTranslationsCheckBox.isSelected()) {
-            pullParams.put("update_translations", true);
-            pullFile.put("params", pullParams);
+            pushParams.put("update_translations", true);
         }
-
         pushParams.put("locale_id", localeId);
         pushFile.put("params", pushParams);
         String defaultLocalePath = getPushPath();
