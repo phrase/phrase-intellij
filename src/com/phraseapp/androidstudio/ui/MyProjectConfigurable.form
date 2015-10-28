@@ -82,11 +82,20 @@
               <text value="Update Translations"/>
             </properties>
           </component>
-          <vspacer id="d6a93">
+          <component id="5f345" class="javax.swing.JButton" binding="createConfigButton">
             <constraints>
-              <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-          </vspacer>
+            <properties>
+              <enabled value="false"/>
+              <text value="Create .phraseapp.yml"/>
+            </properties>
+          </component>
+          <hspacer id="cbe9a">
+            <constraints>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
         </children>
       </grid>
       <grid id="c1656" binding="generatePanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -99,13 +108,13 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="6da43" class="javax.swing.JButton" binding="generateConfig">
+          <component id="6da43" class="javax.swing.JButton" binding="editConfigBtn">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <enabled value="false"/>
-              <text value="Generate new config"/>
+              <text value="Edit"/>
             </properties>
           </component>
           <component id="9334f" class="javax.swing.JTextPane" binding="configExistInfoText">

@@ -8,7 +8,6 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.phraseapp.androidstudio.*;
 import org.jetbrains.annotations.Nls;
@@ -31,8 +30,6 @@ import java.util.*;
  * Created by gfrey on 22/10/15.
  */
 public class MyProjectConfigurable implements SearchableConfigurable, Configurable.NoScroll {
-    private String projectId = "";
-    private String localeId = "";
     private String currentConfig;
     private Project project = null;
 
@@ -46,11 +43,12 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private JComboBox defaultLocaleComboBox;
     private JPanel configPanel;
     private JPanel generatePanel;
-    private JButton generateConfig;
+    private JButton editConfigBtn;
     private JCheckBox updateTranslationsCheckBox;
     private JPanel clientPanel;
     private JTextPane infoPane;
     private JTextPane configExistInfoText;
+    private JButton createConfigButton;
     private boolean alreadyGeneratedConfig = false;
 
     public MyProjectConfigurable(Project project) {
@@ -173,11 +171,24 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             }
         });
 
-        generateConfig.addActionListener(new ActionListener() {
+        editConfigBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 configPanel.setVisible(true);
                 generatePanel.setVisible(false);
+
+                if (getAccessToken().length() == 64) {
+                    updateProjectSelect();
+                }
+            }
+        });
+
+        createConfigButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
+                configuration.generateConfig(getConfigMap());
+                JOptionPane.showMessageDialog(rootPanel, "Successfully created new .phraseapp.yml configuration file");
             }
         });
 
@@ -210,9 +221,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == 1) {
-                    APIResource project = projects.getModelAt(
-                            projectsComboBox.getSelectedIndex());
-                    projectId = project.getId();
                     updateLocaleSelect();
                 }
             }
@@ -229,17 +237,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             @Override
             public void focusLost(FocusEvent focusEvent) {
 
-            }
-        });
-
-        defaultLocaleComboBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == 1) {
-                    APIResource locale = locales.getModelAt(
-                            defaultLocaleComboBox.getSelectedIndex());
-                    localeId = locale.getId();
-                }
             }
         });
     }
@@ -261,7 +258,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     private void disableCLientRelatedFields() {
         accessTokenTextField.setEnabled(false);
-        generateConfig.setEnabled(false);
+        editConfigBtn.setEnabled(false);
         updateTranslationsCheckBox.setEnabled(false);
         projectsComboBox.setEnabled(false);
         defaultLocaleComboBox.setEnabled(false);
@@ -269,10 +266,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     private void enableClientRelatedFields() {
         accessTokenTextField.setEnabled(true);
-        generateConfig.setEnabled(true);
-        updateTranslationsCheckBox.setEnabled(true);
-        projectsComboBox.setEnabled(true);
-        defaultLocaleComboBox.setEnabled(true);
+        editConfigBtn.setEnabled(true);
     }
 
     @Nls
@@ -293,93 +287,29 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             return;
         }
 
-        if (projectId == null || localeId == null) {
+        if (getSelectedProject() == null || getSelectedLocale() == null) {
             JOptionPane.showMessageDialog(rootPanel, "Please verify that you have entered a valida access token and selected a project and locale.");
             return;
         }
 
         PropertiesRepository.getInstance().setClientPath(getClientPath());
 
-        if (configPanel.isVisible() && !alreadyGeneratedConfig) {
+        if (configPanel.isVisible()) {
             PropertiesRepository.getInstance().setAccessToken(getAccessToken());
-            PropertiesRepository.getInstance().setProjectId(projectId);
-
-            int genrateConfigChoice = JOptionPane.YES_OPTION;
-            if (configExists()) {
-                genrateConfigChoice = JOptionPane.showOptionDialog(null,
-                        "Should we generate a new .phraseap.yml with your current seetings?",
-                        "PhraseApp",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null, null, null);
-            }
-
-            if (genrateConfigChoice == JOptionPane.YES_OPTION) {
-                alreadyGeneratedConfig = true;
-                PhraseAppConfiguration configuration = new PhraseAppConfiguration(getProject());
-                configuration.generateConfig(getConfigMap());
-            }
+            PropertiesRepository.getInstance().setProjectId(getSelectedProject());
         }
 
         final API api = new API(getClientPath(), getAccessToken(), project);
-        // Check if we have more local Locales than remote
-        APIResourceListModel remoteLocales = api.getLocales(projectId);
-
-        final ArrayList<String> remoteLocaleNames = new ArrayList<String>();
-        for (int i = 0; i < remoteLocales.getSize(); i++) {
-            remoteLocaleNames.add(remoteLocales.getModelAt(i).getName());
-        }
-
-        final ToolWindowOutputWriter outputWriter = new ToolWindowOutputWriter(project);
-        int uploadLocalesChoice = JOptionPane.showOptionDialog(null,
-                "We found Locales in your Project that aren't in PhraseApp yet, upload them?",
-                "PhraseApp",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null, null, null);
-        if (uploadLocalesChoice == JOptionPane.YES_OPTION) {
-            final LinkedList<VirtualFile> localLocales = ProjectHelper.findProjectLocales(project.getBaseDir());
-            outputWriter.writeOutput("Started Uploading missing locales ...");
-
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    uploadLocales(api, localLocales, remoteLocaleNames, outputWriter);
-                    outputWriter.writeOutput("Finished");
-                }
-            });
-            thread.start();
-        }
-
-    }
-
-    private void uploadLocales(API api, LinkedList<VirtualFile> localLocales, ArrayList<String> remoteLocaleNames, ToolWindowOutputWriter outputWriter) {
-        for (VirtualFile locale : localLocales) {
-            String localeName = ProjectHelper.getLocaleName(locale);
-
-            if (!remoteLocaleNames.contains(localeName)) {
-                // Create Locale
-                locales = api.postLocales(
-                        projectId,
-                        localeName
-                );
-                // Upload Locale
-                APIResourceListModel upload = api.uploadLocale(
-                        projectId,
-                        localeName,
-                        locale.getPath(),
-                        "xml"
-                );
-
-                if (upload != null) {
-                    if (!upload.isValid()) {
-                        outputWriter.writeOutput("Could not upload locale: " + localeName + "\n" + ColorTextPane.ANSI_RED + upload.getErrors() + ColorTextPane.ANSI_STOP);
-                    } else {
-                        outputWriter.writeOutput("Uploaded locale: " + ColorTextPane.ANSI_GREEN + localeName + ColorTextPane.ANSI_STOP);
-                    }
-                } else {
-                    outputWriter.writeOutput("Could not upload locale: " + localeName);
-                }
+        ProjectLocalesUploader projectLocalesUploader = new ProjectLocalesUploader(project, getSelectedProject(), api);
+        if (projectLocalesUploader.detectedMissingRemoteLocales()) {
+            int uploadLocalesChoice = JOptionPane.showOptionDialog(null,
+                    "We found Locales in your Project that aren't in PhraseApp yet, upload them?",
+                    "PhraseApp",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, null, null);
+            if (uploadLocalesChoice == JOptionPane.YES_OPTION) {
+                projectLocalesUploader.upload();
             }
         }
     }
@@ -432,17 +362,17 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     }
 
     private void resetProjectSelect() {
-        projectId = null;
         projects = new APIResourceListModel();
         projectsComboBox.setModel(projects);
         projectsComboBox.setEnabled(false);
+        createConfigButton.setEnabled(false);
     }
 
     private void updateProjectSelect() {
         API api = new API(getClientPath(), getAccessToken(), project);
         projects = api.getProjects();
 
-        if (projects != null) {
+        if (projects.isValid()) {
             if (projects.isEmpty()) {
                 int choice = JOptionPane.showOptionDialog(null,
                         "No projects found. Should we create an initial project for you?",
@@ -452,54 +382,69 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                         null, null, null);
                 if (choice == JOptionPane.YES_OPTION) {
                     projects = api.postProjects(getProject().getName());
+                    if (!projects.isValid()) {
+                        JOptionPane.showMessageDialog(rootPanel, "Could not create new project. Please verify that you have added a valid Access Token. " + projects.getErrors());
+                    }
                 }
             }
-            projectsComboBox.setModel(projects);
-            projectsComboBox.setEnabled(true);
 
             if (projects.isEmpty()) {
+                resetProjectSelect();
                 resetLocaleSelect();
             } else {
+                projectsComboBox.setModel(projects);
+                projectsComboBox.setEnabled(true);
                 projectsComboBox.setSelectedIndex(0);
+                createConfigButton.setEnabled(true);
             }
 
         } else {
             resetLocaleSelect();
-            projectsComboBox.setEnabled(false);
-            JOptionPane.showMessageDialog(rootPanel, "The access_token is not valid. Please generate a APIv2 token at: https://phraseapp.com/settings/oauth_access_tokens");
+            resetProjectSelect();
+            JOptionPane.showMessageDialog(rootPanel, "Could not fetch projects from PhraseApp. Please verify that you have added a valid Access Token. " + projects.getErrors());
         }
     }
 
     private void resetLocaleSelect() {
-        localeId = null;
         locales = new APIResourceListModel();
         defaultLocaleComboBox.setModel(locales);
         defaultLocaleComboBox.setEnabled(false);
+        updateTranslationsCheckBox.setEnabled(false);
     }
 
     private void updateLocaleSelect() {
         API api = new API(getClientPath(), getAccessToken(), project);
 
-        if (!projectId.isEmpty()) {
-            locales = api.getLocales(projectId);
-            if (locales.isEmpty()) {
-                String[] localesList = {"en", "de", "fr", "es", "it", "pt", "zh"};
+        if (!getSelectedProject().isEmpty()) {
+            locales = api.getLocales(getSelectedProject());
+            if (locales.isValid()) {
+                if (locales.isEmpty()) {
+                    String[] localesList = {"en", "de", "fr", "es", "it", "pt", "zh"};
 
-                String localeName = (String) JOptionPane.showInputDialog(rootPanel,
-                        "No locales found. What is the name of the locale we should create for you?",
-                        "PhraseApp",
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        localesList,
-                        localesList[0]);
-                locales = api.postLocales(projectId, localeName);
-                defaultLocaleComboBox.setModel(locales);
-                defaultLocaleComboBox.setSelectedIndex(0);
-                defaultLocaleComboBox.setEnabled(true);
+                    String localeName = (String) JOptionPane.showInputDialog(rootPanel,
+                            "No locales found. What is the name of the locale we should create for you?",
+                            "PhraseApp",
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            localesList,
+                            localesList[0]);
+                    locales = api.postLocales(getSelectedProject(), localeName);
+                    if (!locales.isValid()) {
+                        JOptionPane.showMessageDialog(rootPanel, "Could not create locale. Please verify that you have added a valid Access Token." + locales.getErrors());
+                    }
+                }
+
+                if (locales.isEmpty()) {
+                    resetLocaleSelect();
+                } else {
+                    defaultLocaleComboBox.setModel(locales);
+                    defaultLocaleComboBox.setSelectedIndex(0);
+                    defaultLocaleComboBox.setEnabled(true);
+                    updateTranslationsCheckBox.setEnabled(true);
+
+                }
             } else {
-                defaultLocaleComboBox.setModel(locales);
-                defaultLocaleComboBox.setSelectedIndex(0);
-                defaultLocaleComboBox.setEnabled(true);
+                JOptionPane.showMessageDialog(rootPanel, "Could not fetch locales. Please verify that you have added a valid Access Token." + locales.getErrors());
             }
         }
     }
@@ -517,7 +462,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         if (updateTranslationsCheckBox.isSelected()) {
             pushParams.put("update_translations", true);
         }
-        pushParams.put("locale_id", localeId);
+        pushParams.put("locale_id", getSelectedLocale());
         pushFile.put("params", pushParams);
         String defaultLocalePath = getPushPath();
         pushFile.put("file", defaultLocalePath);
@@ -528,7 +473,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
         root.put("push", push);
         root.put("pull", pull);
-        root.put("project_id", projectId);
+        root.put("project_id", getSelectedProject());
         root.put("access_token", getAccessToken());
         root.put("file_format", "xml");
 
@@ -554,6 +499,26 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     @NotNull
     private String getClientPath() {
         return clientPathFormattedTextField.getText().trim();
+    }
+
+    private String getSelectedProject() {
+        if (projectsComboBox.getSelectedIndex() == -1) {
+            return "";
+        }
+
+        APIResource project = projects.getModelAt(
+                projectsComboBox.getSelectedIndex());
+        return project.getId();
+    }
+
+    private String getSelectedLocale() {
+        if (defaultLocaleComboBox.getSelectedIndex() == -1) {
+            return "";
+        }
+
+        APIResource locale = locales.getModelAt(
+                defaultLocaleComboBox.getSelectedIndex());
+        return locale.getId();
     }
 }
 

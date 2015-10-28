@@ -75,6 +75,7 @@ public class API {
 
     @Nullable
     private APIResourceListModel runCommand(String resource, String action, List<String> params) {
+        APIResourceListModel resourceList = new APIResourceListModel();
 
         GeneralCommandLine gcl = new GeneralCommandLine(clientPath,
                 resource);
@@ -96,7 +97,7 @@ public class API {
             String error = output.getStderr();
 
             if(!error.isEmpty()){
-                APIResourceListModel resourceList = new APIResourceListModel();
+
                 resourceList.addError(error);
                 return resourceList;
             }
@@ -108,7 +109,7 @@ public class API {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        return null;
+        return resourceList;
     }
 
     private APIResourceListModel handleResponse(String response) {
