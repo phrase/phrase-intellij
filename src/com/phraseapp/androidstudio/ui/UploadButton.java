@@ -1,5 +1,8 @@
 package com.phraseapp.androidstudio.ui;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -31,6 +34,17 @@ public class UploadButton extends AnAction {
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
+        final PhraseAppConfiguration configuration = new PhraseAppConfiguration(e.getProject());
+        if (!configuration.configExists()) {
+            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "A .phraseapp.yml could not be found. Please use the PhraseApp plugin settings to generate one.", NotificationType.ERROR));
+            return;
+        }
+
+        if (!configuration.hasProjectId() || !configuration.hasAccessToken()) {
+            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please verify that your .phraseapp.yml contains a valid access_token and project_id.", NotificationType.ERROR));
+            return;
+        }
+
         final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
         final String localeName = ProjectHelper.getLocaleName(file);
         final ToolWindowOutputWriter outputWriter = new ToolWindowOutputWriter(e.getProject());
@@ -39,14 +53,10 @@ public class UploadButton extends AnAction {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                final API api = new API(PropertiesRepository.getInstance().getClientPath(), "123", e.getProject());
-
-                api.postLocales(PropertiesRepository.getInstance().getProjectId(), localeName);
+                final API api = new API(PropertiesRepository.getInstance().getClientPath(), configuration.getAccessToken(), e.getProject());
+                api.postLocales(configuration.getProjectId(), localeName);
                 APIResourceListModel upload = api.uploadLocale(
-                        PropertiesRepository.getInstance().
-
-                                getProjectId(),
-
+                        configuration.getProjectId(),
                         ProjectHelper.getLocaleName(file),
                         file.getPath(),
                         "xml"
@@ -61,6 +71,7 @@ public class UploadButton extends AnAction {
         });
 
         thread.start();
+
     }
 
 }

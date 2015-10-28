@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.Map;
 import java.util.Scanner;
@@ -13,9 +14,12 @@ import java.util.Scanner;
  */
 public class PhraseAppConfiguration {
     private final Project project;
+    private String currentConfig;
+
 
     public PhraseAppConfiguration(Project project){
         this.project = project;
+        this.currentConfig = loadPhraseAppConfig();
     }
 
     public void setConfig(String s) {
@@ -24,6 +28,7 @@ public class PhraseAppConfiguration {
             File configFile = new File(projectPath + "/.phraseapp.yml");
             System.out.println(configFile);
             FileUtils.writeStringToFile(configFile, s);
+            currentConfig = s;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,5 +60,46 @@ public class PhraseAppConfiguration {
         }
 
         return text.toString();
+    }
+
+    public String getProjectId() {
+        String projectId = null;
+        if (configExists()) {
+            Yaml yaml = new Yaml();
+            Map configYml = (Map) yaml.load(currentConfig);
+            Map root = (Map) configYml.get("phraseapp");
+            if (root != null) {
+                projectId = (String) root.get("project_id");
+            }
+        }
+
+        return projectId;
+    }
+
+    public String getAccessToken() {
+        String accessToken = null;
+
+        if (configExists()) {
+            Yaml yaml = new Yaml();
+            Map configYml = (Map) yaml.load(currentConfig);
+            Map root = (Map) configYml.get("phraseapp");
+            if (root != null) {
+                accessToken = (String) root.get("access_token");
+            }
+        }
+
+        return accessToken;
+    }
+
+    public boolean configExists() {
+        return currentConfig.startsWith("phraseapp");
+    }
+
+    public boolean hasProjectId() {
+        return getProjectId() != null;
+    }
+
+    public boolean hasAccessToken() {
+        return getAccessToken() != null;
     }
 }
