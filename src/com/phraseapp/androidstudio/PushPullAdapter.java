@@ -73,7 +73,7 @@ public class PushPullAdapter {
                         @Override
                         public void run() {
                             finalArea.setEditable(true);
-                            finalArea.appendANSI(getFormattedTime() + "Connecting with PhraseApp ...\n");
+                            finalArea.appendANSI(getFormattedTime() + "phraseapp " + clientAction + "\n");
                         }
                     });
                 }
@@ -83,7 +83,6 @@ public class PushPullAdapter {
                     ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            finalArea.append(Color.getHSBColor(0.000f, 0.000f, 0.000f), getFormattedTime() + "Finished\n");
                             finalArea.setEditable(false);
                         }
                     });

@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VFileProperty;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -54,6 +56,12 @@ public class ProjectHelper {
 
     public static boolean isLocaleFile(VirtualFile file) {
         return file.getPath().contains("src/main/res/values-") && file.getName().equals("strings.xml");
+    }
+
+    @NotNull
+    public static String getRelativPath(Project project, VirtualFile file) {
+        String path = file.getPath();
+        return path.substring(project.getBasePath().length(), path.length());
     }
 
 }

@@ -27,7 +27,6 @@ public class ProjectLocalesUploader {
 
     }
 
-
     public boolean detectedMissingRemoteLocales(){
         for (int i = 0; i < localLocales.size(); i++) {
             if (!remoteLocaleNames.contains(ProjectHelper.getLocaleName(localLocales.get(i)))){
@@ -64,6 +63,8 @@ public class ProjectLocalesUploader {
     private void uploadLocales(API api, LinkedList<VirtualFile> localLocales, ArrayList<String> remoteLocaleNames, ToolWindowOutputWriter outputWriter) {
         for (VirtualFile locale : localLocales) {
             String localeName = ProjectHelper.getLocaleName(locale);
+            final String relativePath = ProjectHelper.getRelativPath(project, locale);
+
 
             if (!remoteLocaleNames.contains(localeName)) {
                 // Create Locale
@@ -81,12 +82,12 @@ public class ProjectLocalesUploader {
 
                 if (upload != null) {
                     if (!upload.isValid()) {
-                        outputWriter.writeOutput("Could not upload locale: " + localeName + "\n" + ColorTextPane.ANSI_RED + upload.getErrors() + ColorTextPane.ANSI_STOP);
+                        outputWriter.writeOutput("Could not upload locale: " + relativePath + "\n" + ColorTextPane.ANSI_RED + upload.getErrors() + ColorTextPane.ANSI_STOP);
                     } else {
-                        outputWriter.writeOutput("Uploaded locale: " + ColorTextPane.ANSI_GREEN + localeName + ColorTextPane.ANSI_STOP);
+                        outputWriter.writeOutput("Uploaded " + ColorTextPane.ANSI_GREEN + relativePath + ColorTextPane.ANSI_STOP);
                     }
                 } else {
-                    outputWriter.writeOutput("Could not upload locale: " + localeName);
+                    outputWriter.writeOutput("Could not upload locale: " + relativePath);
                 }
             }
         }

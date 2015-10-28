@@ -7,8 +7,10 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.phraseapp.androidstudio.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -34,6 +36,11 @@ public class UploadButton extends AnAction {
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
+        if (PropertiesRepository.getInstance().getClientPath().isEmpty()) {
+            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the 'phraseapp' client in the PhraseApp plugin settings.", NotificationType.ERROR));
+            return;
+        }
+
         final PhraseAppConfiguration configuration = new PhraseAppConfiguration(e.getProject());
         if (!configuration.configExists()) {
             Notifications.Bus.notify(new Notification("PhraseApp", "Error", "A .phraseapp.yml could not be found. Please use the PhraseApp plugin settings to generate one.", NotificationType.ERROR));
@@ -48,7 +55,9 @@ public class UploadButton extends AnAction {
         final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
         final String localeName = ProjectHelper.getLocaleName(file);
         final ToolWindowOutputWriter outputWriter = new ToolWindowOutputWriter(e.getProject());
-        outputWriter.writeOutput("Started Uploading locale: " + ColorTextPane.ANSI_GREEN + localeName + ColorTextPane.ANSI_STOP);
+        final String relativePath = ProjectHelper.getRelativPath(e.getProject(), file);
+
+        outputWriter.writeOutput("Uploading " + ColorTextPane.ANSI_GREEN + relativePath + ColorTextPane.ANSI_STOP);
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -66,12 +75,11 @@ public class UploadButton extends AnAction {
                     outputWriter.writeOutput(ColorTextPane.ANSI_RED + upload.getErrors() + ColorTextPane.ANSI_STOP);
                 }
 
-                outputWriter.writeOutput("Finished");
+                outputWriter.writeOutput("Uploaded " + ColorTextPane.ANSI_GREEN + relativePath + ColorTextPane.ANSI_STOP);
             }
         });
 
         thread.start();
 
     }
-
 }

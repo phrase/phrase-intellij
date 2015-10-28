@@ -176,7 +176,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             }
 
             private void checkToken() {
-                if (accessTokenTextField.getText().length() == 64) {
+                if (getAccessToken().length() == 64) {
                     updateProjectSelect();
                 } else {
                     resetProjectSelect();
@@ -191,20 +191,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                 if (e.getStateChange() == 1) {
                     updateLocaleSelect();
                 }
-            }
-        });
-
-        projectsComboBox.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent focusEvent) {
-                if (projects == null || projects.isEmpty()) {
-                    updateProjectSelect();
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent focusEvent) {
-
             }
         });
     }
@@ -229,10 +215,14 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         updateTranslationsCheckBox.setEnabled(false);
         projectsComboBox.setEnabled(false);
         defaultLocaleComboBox.setEnabled(false);
+        createConfigButton.setEnabled(false);
     }
 
     private void enableClientRelatedFields() {
         accessTokenTextField.setEnabled(true);
+        if (getAccessToken().length() == 64) {
+            updateProjectSelect();
+        }
     }
 
     @Nls
@@ -373,7 +363,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                     defaultLocaleComboBox.setSelectedIndex(0);
                     defaultLocaleComboBox.setEnabled(true);
                     updateTranslationsCheckBox.setEnabled(true);
-
+                    createConfigButton.setEnabled(true);
                 }
             } else {
                 JOptionPane.showMessageDialog(rootPanel, "Could not fetch locales. Please verify that you have added a valid Access Token." + locales.getErrors());
@@ -442,7 +432,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         }
         pushParams.put("locale_id", getSelectedLocale());
         pushFile.put("params", pushParams);
-        String defaultLocalePath = getPushPath();
+        String defaultLocalePath = "./app/src/main/res/values/strings.xml";
         pushFile.put("file", defaultLocalePath);
         pullFile.put("file", getPullPath(defaultLocalePath));
 
@@ -459,11 +449,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         return base;
     }
 
-    private String getPushPath() {
-        DataContext dataContext = DataManager.getInstance().getDataContext();
-        Project project = (Project) dataContext.getData(DataConstants.PROJECT);
-        return project.getBasePath() + "/app/src/main/res/values/strings.xml";
-    }
 
     private String getPullPath(String defaultLocalePath) {
         return defaultLocalePath.replaceAll("values", "values-<locale_name>");
