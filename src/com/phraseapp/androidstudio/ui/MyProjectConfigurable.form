@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.phraseapp.androidstudio.ui.MyProjectConfigurable">
-  <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
       <xy x="20" y="20" width="528" height="1205"/>
@@ -11,10 +11,10 @@
       <grid id="6a956" binding="configPanel" layout-manager="GridLayoutManager" row-count="5" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="2" column="0" row-span="2" col-span="2" vsize-policy="0" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="2" col-span="2" vsize-policy="0" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <enabled value="false"/>
+          <enabled value="true"/>
           <visible value="true"/>
         </properties>
         <border type="none"/>
@@ -37,6 +37,7 @@
             </constraints>
             <properties>
               <enabled value="false"/>
+              <toolTipText value="PhraseApp Access Token"/>
             </properties>
           </component>
           <component id="ce54" class="javax.swing.JLabel">
@@ -54,6 +55,7 @@
             </constraints>
             <properties>
               <enabled value="false"/>
+              <toolTipText value="Select the PhraseApp project you wish to use"/>
             </properties>
           </component>
           <component id="e1bfe" class="javax.swing.JLabel">
@@ -71,6 +73,8 @@
             </constraints>
             <properties>
               <enabled value="false"/>
+              <model/>
+              <toolTipText value="Select the language used in ./app/src/main/res/values/strings.xml."/>
             </properties>
           </component>
           <component id="8916c" class="javax.swing.JCheckBox" binding="updateTranslationsCheckBox" default-binding="true">
@@ -88,7 +92,7 @@
             </constraints>
             <properties>
               <enabled value="false"/>
-              <text value="Create .phraseapp.yml"/>
+              <text value="Create new .phraseapp.yml"/>
             </properties>
           </component>
           <hspacer id="cbe9a">
@@ -96,41 +100,6 @@
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
-        </children>
-      </grid>
-      <grid id="c1656" binding="generatePanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="0" bottom="0" right="0"/>
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="196" height="53"/>
-          </grid>
-        </constraints>
-        <properties/>
-        <border type="none"/>
-        <children>
-          <component id="6da43" class="javax.swing.JButton" binding="editConfigBtn">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <enabled value="false"/>
-              <text value="Edit"/>
-            </properties>
-          </component>
-          <component id="9334f" class="javax.swing.JTextPane" binding="configExistInfoText">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="50"/>
-              </grid>
-            </constraints>
-            <properties>
-              <editable value="false"/>
-              <opaque value="false"/>
-            </properties>
-            <clientProperties>
-              <JEditorPane.honorDisplayProperties class="java.lang.Boolean" value="true"/>
-            </clientProperties>
-          </component>
         </children>
       </grid>
       <grid id="428c4" binding="clientPanel" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -182,7 +151,7 @@
       </grid>
       <vspacer id="e6ffe">
         <constraints>
-          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
         </constraints>
       </vspacer>
     </children>

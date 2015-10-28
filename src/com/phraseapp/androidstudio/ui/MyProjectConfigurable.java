@@ -42,14 +42,10 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private JComboBox projectsComboBox;
     private JComboBox defaultLocaleComboBox;
     private JPanel configPanel;
-    private JPanel generatePanel;
-    private JButton editConfigBtn;
     private JCheckBox updateTranslationsCheckBox;
     private JPanel clientPanel;
     private JTextPane infoPane;
-    private JTextPane configExistInfoText;
     private JButton createConfigButton;
-    private boolean alreadyGeneratedConfig = false;
 
     public MyProjectConfigurable(Project project) {
         this.project = project;
@@ -81,12 +77,9 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         initializeActions();
         detectAndSetClientPath();
         createHypertext(infoPane, "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
-        createHypertext(configExistInfoText, "We have detected an existing <a href=http://docs.phraseapp.com/developers/cli/configuration/>.phraseapp.yml</a> configuration file.");
 
         clientPathFormattedTextField.setText(PropertiesRepository.getInstance().getClientPath());
         accessTokenTextField.setText(getAccessTokenFromConfig());
-        configPanel.setVisible(!configExists());
-        generatePanel.setVisible(configExists());
 
         if (API.validateClient(getClientPath(), project.getBasePath())) {
             enableClientRelatedFields();
@@ -162,24 +155,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             @Override
             public void hyperlinkUpdate(HyperlinkEvent event) {
                 handleLinkClick(event);
-            }
-        });
-        configExistInfoText.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent event) {
-                handleLinkClick(event);
-            }
-        });
-
-        editConfigBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                configPanel.setVisible(true);
-                generatePanel.setVisible(false);
-
-                if (getAccessToken().length() == 64) {
-                    updateProjectSelect();
-                }
             }
         });
 
@@ -258,7 +233,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     private void disableCLientRelatedFields() {
         accessTokenTextField.setEnabled(false);
-        editConfigBtn.setEnabled(false);
         updateTranslationsCheckBox.setEnabled(false);
         projectsComboBox.setEnabled(false);
         defaultLocaleComboBox.setEnabled(false);
@@ -266,7 +240,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     private void enableClientRelatedFields() {
         accessTokenTextField.setEnabled(true);
-        editConfigBtn.setEnabled(true);
     }
 
     @Nls
@@ -293,11 +266,8 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         }
 
         PropertiesRepository.getInstance().setClientPath(getClientPath());
-
-        if (configPanel.isVisible()) {
-            PropertiesRepository.getInstance().setAccessToken(getAccessToken());
-            PropertiesRepository.getInstance().setProjectId(getSelectedProject());
-        }
+        PropertiesRepository.getInstance().setAccessToken(getAccessToken());
+        PropertiesRepository.getInstance().setProjectId(getSelectedProject());
 
         final API api = new API(getClientPath(), getAccessToken(), project);
         ProjectLocalesUploader projectLocalesUploader = new ProjectLocalesUploader(project, getSelectedProject(), api);
@@ -336,31 +306,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         return currentConfig.startsWith("phraseapp");
     }
 
-    private Project getProject() {
-        DataContext dataContext = DataManager.getInstance().getDataContext();
-        Project project = (Project) dataContext.getData(DataConstants.PROJECT);
-        return project;
-    }
-
-    private String getAccessTokenFromConfig() {
-        String accessToken = null;
-
-        if (configExists()) {
-            Yaml yaml = new Yaml();
-            Map configYml = (Map) yaml.load(currentConfig);
-            Map root = (Map) configYml.get("phraseapp");
-            if (root != null) {
-                accessToken = (String) root.get("access_token");
-            }
-        }
-
-        if (accessToken == null) {
-            accessToken = PropertiesRepository.getInstance().getAccessToken();
-        }
-
-        return accessToken;
-    }
-
     private void resetProjectSelect() {
         projects = new APIResourceListModel();
         projectsComboBox.setModel(projects);
@@ -394,7 +339,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
             } else {
                 projectsComboBox.setModel(projects);
                 projectsComboBox.setEnabled(true);
-                projectsComboBox.setSelectedIndex(0);
+                projectsComboBox.setSelectedIndex(getProjectIndex());
                 createConfigButton.setEnabled(true);
             }
 
@@ -519,6 +464,66 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         APIResource locale = locales.getModelAt(
                 defaultLocaleComboBox.getSelectedIndex());
         return locale.getId();
+    }
+
+    private Project getProject() {
+        DataContext dataContext = DataManager.getInstance().getDataContext();
+        Project project = (Project) dataContext.getData(DataConstants.PROJECT);
+        return project;
+    }
+
+    private String getAccessTokenFromConfig() {
+        String accessToken = null;
+
+        if (configExists()) {
+            Yaml yaml = new Yaml();
+            Map configYml = (Map) yaml.load(currentConfig);
+            Map root = (Map) configYml.get("phraseapp");
+            if (root != null) {
+                accessToken = (String) root.get("access_token");
+            }
+        }
+
+        if (accessToken == null) {
+            accessToken = PropertiesRepository.getInstance().getAccessToken();
+        }
+
+        return accessToken;
+    }
+
+    private int getProjectIndex() {
+        String projectId = getProjectIdFromConfig();
+        for (int i = 0; i < projects.getSize(); i++) {
+
+            APIResource model = projects.getModelAt(i);
+            System.out.printf("check " + model.getId() + " existing " + projectId);
+
+            if (model.getId().equals(projectId)) {
+                System.out.printf("project index " + projects.getIndexOf(model));
+                return projects.getIndexOf(model);
+            }
+        }
+        System.out.printf("no project index " + projectId);
+
+        return 0;
+    }
+
+    private String getProjectIdFromConfig() {
+        String projectId = null;
+        if (configExists()) {
+            Yaml yaml = new Yaml();
+            Map configYml = (Map) yaml.load(currentConfig);
+            Map root = (Map) configYml.get("phraseapp");
+            if (root != null) {
+                projectId = (String) root.get("project_id");
+            }
+        }
+
+        if (projectId == null) {
+            projectId = PropertiesRepository.getInstance().getProjectId();
+        }
+
+        return projectId;
     }
 }
 
