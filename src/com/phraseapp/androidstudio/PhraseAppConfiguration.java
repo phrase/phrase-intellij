@@ -101,7 +101,6 @@ public class PhraseAppConfiguration {
             Map root = (Map) configYml.get("phraseapp");
             if (root != null) {
                 Map push = (Map) root.get("push");
-                System.out.printf(push.toString());
                 if (push != null) {
                     List<Map> sources = (List<Map>) push.get("sources");
                     Map source = sources.get(0);
