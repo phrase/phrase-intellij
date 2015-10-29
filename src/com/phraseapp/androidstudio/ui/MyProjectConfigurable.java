@@ -40,7 +40,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
     private JComboBox projectsComboBox;
     private JComboBox defaultLocaleComboBox;
     private JPanel configPanel;
-    private JCheckBox updateTranslationsCheckBox;
     private JPanel clientPanel;
     private JTextPane infoPane;
     private JButton createConfigButton;
@@ -212,7 +211,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
     private void disableCLientRelatedFields() {
         accessTokenTextField.setEnabled(false);
-        updateTranslationsCheckBox.setEnabled(false);
         projectsComboBox.setEnabled(false);
         defaultLocaleComboBox.setEnabled(false);
         createConfigButton.setEnabled(false);
@@ -331,7 +329,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         locales = new APIResourceListModel();
         defaultLocaleComboBox.setModel(locales);
         defaultLocaleComboBox.setEnabled(false);
-        updateTranslationsCheckBox.setEnabled(false);
     }
 
     private void updateLocaleSelect() {
@@ -362,7 +359,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                     defaultLocaleComboBox.setModel(locales);
                     defaultLocaleComboBox.setSelectedIndex(getLocaleIndex());
                     defaultLocaleComboBox.setEnabled(true);
-                    updateTranslationsCheckBox.setEnabled(true);
                     createConfigButton.setEnabled(true);
                 }
             } else {
@@ -441,11 +437,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         Map<String, Object> pullFile = new HashMap<String, Object>();
         Map<String, Object> pushFile = new HashMap<String, Object>();
         Map<String, Object> pushParams = new HashMap<String, Object>();
-
-
-        if (updateTranslationsCheckBox.isSelected()) {
-            pushParams.put("update_translations", true);
-        }
+        
         pushParams.put("locale_id", getSelectedLocale());
         pushFile.put("params", pushParams);
         String defaultLocalePath = "./app/src/main/res/values/strings.xml";
