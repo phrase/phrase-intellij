@@ -1,6 +1,11 @@
 package com.phraseapp.androidstudio;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.impl.local.LocalFileSystemBase;
+import com.intellij.openapi.vfs.newvfs.NewVirtualFile;
+import com.intellij.openapi.vfs.impl.*;
 import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -29,6 +34,7 @@ public class PhraseAppConfiguration {
             File configFile = new File(projectPath + "/.phraseapp.yml");
             System.out.println(configFile);
             FileUtils.writeStringToFile(configFile, s);
+            LocalFileSystem.getInstance().findFileByIoFile(configFile).refresh(false, false);
             currentConfig = s;
         } catch (IOException e) {
             e.printStackTrace();
