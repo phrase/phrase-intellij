@@ -6,6 +6,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -89,6 +90,30 @@ public class PhraseAppConfiguration {
         }
 
         return accessToken;
+    }
+
+    public String getLocaleId() {
+        String localeId = null;
+
+        if (configExists()) {
+            Yaml yaml = new Yaml();
+            Map configYml = (Map) yaml.load(currentConfig);
+            Map root = (Map) configYml.get("phraseapp");
+            if (root != null) {
+                Map push = (Map) root.get("push");
+                System.out.printf(push.toString());
+                if (push != null) {
+                    List<Map> sources = (List<Map>) push.get("sources");
+                    Map source = sources.get(0);
+                    Map params = (Map) source.get("params");
+                    if (params != null){
+                        localeId = (String) params.get("locale_id");
+                    }
+                }
+            }
+        }
+
+        return localeId;
     }
 
     public boolean configExists() {

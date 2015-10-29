@@ -360,7 +360,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                     resetLocaleSelect();
                 } else {
                     defaultLocaleComboBox.setModel(locales);
-                    defaultLocaleComboBox.setSelectedIndex(0);
+                    defaultLocaleComboBox.setSelectedIndex(getLocaleIndex());
                     defaultLocaleComboBox.setEnabled(true);
                     updateTranslationsCheckBox.setEnabled(true);
                     createConfigButton.setEnabled(true);
@@ -410,6 +410,22 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
 
                 if (model.getId().equals(projectId)) {
                     return projects.getIndexOf(model);
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private int getLocaleIndex() {
+        String localeId = configuration.getLocaleId();
+        if(localeId != null) {
+            for (int i = 0; i < locales.getSize(); i++) {
+
+                APIResource model = locales.getModelAt(i);
+
+                if (model.getId().equals(localeId)) {
+                    return locales.getIndexOf(model);
                 }
             }
         }
