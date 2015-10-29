@@ -1,8 +1,5 @@
 package com.phraseapp.androidstudio.ui;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataConstants;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
@@ -437,7 +434,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         Map<String, Object> pullFile = new HashMap<String, Object>();
         Map<String, Object> pushFile = new HashMap<String, Object>();
         Map<String, Object> pushParams = new HashMap<String, Object>();
-        
+
         pushParams.put("locale_id", getSelectedLocale());
         pushFile.put("params", pushParams);
         String defaultLocalePath = "./app/src/main/res/values/strings.xml";

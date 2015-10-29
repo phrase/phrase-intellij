@@ -61,7 +61,7 @@ public class API {
     }
 
 
-    public APIResourceListModel uploadLocale(String projectId, String localeId, String file, String fileformat) {
+    public APIResourceListModel uploadLocale(String projectId, String localeId, String file, String fileformat, String updateTranslations) {
         List<String> params = new ArrayList<String>();
         params.add(projectId);
         params.add("--locale-id");
@@ -70,6 +70,8 @@ public class API {
         params.add(file);
         params.add("--file-format");
         params.add(fileformat);
+        params.add("--update-translations");
+        params.add(updateTranslations);
         return runCommand("upload", "create", params);
     }
 

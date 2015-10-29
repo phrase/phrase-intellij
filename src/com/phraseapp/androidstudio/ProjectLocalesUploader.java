@@ -77,8 +77,8 @@ public class ProjectLocalesUploader {
                         remoteProjectId,
                         localeName,
                         locale.getPath(),
-                        "xml"
-                );
+                        "xml",
+                        "false");
 
                 if (upload != null) {
                     if (!upload.isValid()) {

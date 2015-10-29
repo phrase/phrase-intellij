@@ -6,16 +6,11 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.phraseapp.androidstudio.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.swing.*;
 
 /**
  * Created by kolja on 26.10.15.
@@ -52,6 +47,19 @@ public class UploadButton extends AnAction {
             return;
         }
 
+        int choice = JOptionPane.showOptionDialog(null,
+                "Do you want to update the translations existing in PhraseApp with the content of your file?",
+                "PhraseApp",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null, null, null);
+        final String updateTranslations;
+        if (choice == JOptionPane.YES_OPTION) {
+            updateTranslations = "true";
+        } else {
+            updateTranslations = "false";
+        }
+
         final VirtualFile file = CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
         final String localeName = ProjectHelper.getLocaleName(file);
         final ToolWindowOutputWriter outputWriter = new ToolWindowOutputWriter(e.getProject());
@@ -68,7 +76,8 @@ public class UploadButton extends AnAction {
                         configuration.getProjectId(),
                         ProjectHelper.getLocaleName(file),
                         file.getPath(),
-                        "xml"
+                        "xml",
+                        updateTranslations
                 );
 
                 if (upload != null && !upload.isValid()) {
