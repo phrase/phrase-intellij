@@ -34,7 +34,7 @@ public class PhraseAppConfiguration {
             File configFile = new File(projectPath + "/.phraseapp.yml");
             System.out.println(configFile);
             FileUtils.writeStringToFile(configFile, s);
-            LocalFileSystem.getInstance().findFileByIoFile(configFile).refresh(false, false);
+            LocalFileSystem.getInstance().refreshIoFiles(Arrays.asList(configFile));
             currentConfig = s;
         } catch (IOException e) {
             e.printStackTrace();
