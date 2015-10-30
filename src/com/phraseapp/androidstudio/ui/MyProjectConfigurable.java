@@ -202,7 +202,6 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
             }
-            ;
         }
     }
 
