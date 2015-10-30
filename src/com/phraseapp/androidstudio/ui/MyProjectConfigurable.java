@@ -136,7 +136,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                 if (API.validateClient(getClientPath(), project.getBasePath())) {
                     enableClientRelatedFields();
                 } else {
-                    disableCLientRelatedFields();
+                    disableClientRelatedFields();
                 }
             }
         });
@@ -206,7 +206,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
         }
     }
 
-    private void disableCLientRelatedFields() {
+    private void disableClientRelatedFields() {
         accessTokenTextField.setEnabled(false);
         projectsComboBox.setEnabled(false);
         defaultLocaleComboBox.setEnabled(false);
