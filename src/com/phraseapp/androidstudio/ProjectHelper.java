@@ -1,16 +1,15 @@
 package com.phraseapp.androidstudio;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VFileProperty;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VFileProperty;
-import com.intellij.openapi.vfs.VirtualFileAdapter;
-import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -55,7 +54,7 @@ public class ProjectHelper {
     }
 
     public static boolean isLocaleFile(VirtualFile file) {
-        return file.getPath().contains("src/main/res/values-") && file.getName().equals("strings.xml");
+        return file.getPath().contains("app/src/main/res/values-") && file.getName().equals("strings.xml");
     }
 
     @NotNull
