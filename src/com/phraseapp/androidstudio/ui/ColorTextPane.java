@@ -1,8 +1,11 @@
 package com.phraseapp.androidstudio.ui;
 
 import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.Color;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import java.awt.*;
 
 public class ColorTextPane extends JTextPane {
     static final Color D_Black   = Color.getHSBColor( 0.000f, 0.000f, 0.000f );

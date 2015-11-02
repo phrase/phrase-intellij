@@ -6,7 +6,10 @@ import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Created by kolja on 21.10.15.

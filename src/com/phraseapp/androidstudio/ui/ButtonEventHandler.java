@@ -5,9 +5,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.phraseapp.androidstudio.PushPullAdapter;
-import com.phraseapp.androidstudio.PhraseAppConfiguration;
-import com.phraseapp.androidstudio.PropertiesRepository;
+import com.phraseapp.androidstudio.*;
 
 
 /**
@@ -15,18 +13,19 @@ import com.phraseapp.androidstudio.PropertiesRepository;
  */
 public class ButtonEventHandler {
     public void handleEvent(final AnActionEvent e, final String clientAction) {
-        Project project = e.getProject();
-        PhraseAppConfiguration configuration = new PhraseAppConfiguration(e.getProject());
         final String clientPath = PropertiesRepository.getInstance().getClientPath();
 
-        if (clientPath.isEmpty()) {
+        if (clientPath.isEmpty() || !API.validateClient(clientPath)) {
             Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the 'phraseapp' client in the PhraseApp plugin settings.", NotificationType.ERROR));
             return;
         }
 
-        if (!configuration.loadPhraseAppConfig().startsWith("phraseapp")) {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please create a '.phraseapp.yml' configuration file in your project root folder. You can generate a '.phraseapp.yml' configuration file in the plugin settings.", NotificationType.ERROR));
-            return;
+        Project project = e.getProject();
+        PhraseAppConfiguration configuration = new PhraseAppConfiguration(e.getProject());
+        if (!configuration.configExists()) {
+            ConfigAction ca = new ConfigAction();
+            ca.actionPerformed(e);
+            return; // TODO maybe get response config
         }
 
         PushPullAdapter phraseAppClient = new PushPullAdapter(clientPath, project);

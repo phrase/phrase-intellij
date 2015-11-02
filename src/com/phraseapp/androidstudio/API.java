@@ -5,13 +5,11 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,10 +140,8 @@ public class API {
         return null;
     }
 
-    public static boolean validateClient(String path, String workingDir) {
-        GeneralCommandLine gcl = new GeneralCommandLine(path,
-                "info");
-        gcl.withWorkDirectory(workingDir);
+    public static boolean validateClient(String path) {
+        GeneralCommandLine gcl = new GeneralCommandLine(path, "info");
         final CapturingProcessHandler processHandler;
         try {
             processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());

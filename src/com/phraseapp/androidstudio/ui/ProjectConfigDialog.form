@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.phraseapp.androidstudio.ui.ProjectConfigDialog">
+  <grid id="e61f" binding="rootPanel" layout-manager="GridLayoutManager" row-count="9" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="10" left="10" bottom="10" right="10"/>
+    <constraints>
+      <xy x="20" y="20" width="640" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="eefe6" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <labelFor value="f3668"/>
+          <text value="Access Token"/>
+        </properties>
+      </component>
+      <component id="49846" class="javax.swing.JTextField" binding="accessTokenTextField" default-binding="true">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <toolTipText value="PhraseApp Access Token"/>
+        </properties>
+      </component>
+      <component id="a3026" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <labelFor value="6838a"/>
+          <text value="Projects"/>
+        </properties>
+      </component>
+      <component id="cad5e" class="javax.swing.JComboBox" binding="projectsComboBox" default-binding="true">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <editable value="false"/>
+          <enabled value="false"/>
+          <toolTipText value="Select the PhraseApp project you wish to use"/>
+        </properties>
+      </component>
+      <component id="e3d4d" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <labelFor value="ca0a2"/>
+          <text value="Default Locale"/>
+        </properties>
+      </component>
+      <component id="b1a45" class="javax.swing.JComboBox" binding="defaultLocaleComboBox" default-binding="true">
+        <constraints>
+          <grid row="4" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="false"/>
+          <model/>
+          <toolTipText value="Select the language used in ./app/src/main/res/values/strings.xml."/>
+        </properties>
+      </component>
+      <component id="23921" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="9"/>
+          <text value="The default locale is the language used in /res/values/strings.xml"/>
+        </properties>
+      </component>
+      <component id="44ce0" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="9"/>
+          <text value="Choose a PhraseApp Project"/>
+        </properties>
+      </component>
+      <component id="ec4a2" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="9"/>
+          <text value="Your generated PhraseApp API Access Token"/>
+        </properties>
+      </component>
+      <component id="d3814" class="javax.swing.JCheckBox" binding="uploadLocalesCheckbox">
+        <constraints>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <selected value="true"/>
+          <text value="Upload all locales from your project to PhraseApp."/>
+        </properties>
+      </component>
+      <component id="48866" class="javax.swing.JSeparator">
+        <constraints>
+          <grid row="6" column="0" row-span="1" col-span="3" vsize-policy="2" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <vspacer id="cbef0">
+        <constraints>
+          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+    </children>
+  </grid>
+</form>
