@@ -114,7 +114,7 @@ public class MyProjectConfigurable implements SearchableConfigurable, Configurab
                 return file.getName().startsWith("phraseapp");
             }
         };
-        clientPathFormattedTextField.addBrowseFolderListener("Choose PhraseApp Client", "", null, fileChooserDescriptor);
+        clientPathFormattedTextField.addBrowseFolderListener("Select PhraseApp Client", "", null, fileChooserDescriptor);
 
         JTextField clientPathTextField = clientPathFormattedTextField.getTextField();
         clientPathTextField.getDocument().addDocumentListener(new DocumentListener() {
