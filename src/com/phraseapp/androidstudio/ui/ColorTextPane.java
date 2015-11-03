@@ -15,7 +15,7 @@ public class ColorTextPane extends JTextPane {
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_GREEN = "\u001B[0;32;1m";
     public static final String ANSI_STOP = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[0;31m";;
+    public static final String ANSI_RED = "\u001B[0;31m";
     static Color colorCurrent    = D_Black;
     String remaining = "";
 
