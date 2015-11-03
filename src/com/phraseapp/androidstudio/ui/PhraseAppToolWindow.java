@@ -52,6 +52,9 @@ public class PhraseAppToolWindow implements ToolWindowFactory {
 
         group.addSeparator();
 
+        WebButton webB = new WebButton("Translation Center", "", IconLoader.getIcon("/icons/home.png"));
+        group.add(webB);
+
         HelpButton helpB = new HelpButton("Help", "", IconLoader.getIcon("/icons/question.png"));
         group.add(helpB);
 
