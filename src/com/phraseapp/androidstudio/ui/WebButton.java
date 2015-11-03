@@ -15,6 +15,9 @@ import java.net.URISyntaxException;
 
 public class WebButton extends AnAction {
 
+    public WebButton() {
+    }
+
     public WebButton(String s, String s1, Icon icon) {
         super(s, s1, icon);
     }
