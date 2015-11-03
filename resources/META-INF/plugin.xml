@@ -29,7 +29,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable groupId="tools" instance="com.phraseapp.androidstudio.ui.MyPhraseAppConfigurable"></projectConfigurable>
-        <toolWindow id="PhraseApp" anchor="right" icon="/phrase_13x13.png"
+        <toolWindow id="PhraseApp" anchor="right" icon="/icons/phrase_13x13.png"
                     factoryClass="com.phraseapp.androidstudio.ui.PhraseAppToolWindow"></toolWindow>
     </extensions>
 
@@ -42,7 +42,7 @@
     </project-components>
 
     <actions>
-        <group id="PhraseAppToolGroup" popup="true" text="PhraseApp" icon="/phrase_13x13.png"
+        <group id="PhraseAppToolGroup" popup="true" text="PhraseApp" icon="/icons/phrase_13x13.png"
                class="com.phraseapp.androidstudio.ui.PhraseAppToolGroup">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
@@ -77,7 +77,7 @@
         </action>
 
         <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.ui.UploadButton"
-                text="Upload Locale" icon="/phrase_13x13.png"
+                text="Upload Locale" icon="/icons/phrase_13x13.png"
                 description="Upload Locale to PhraseApp">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>

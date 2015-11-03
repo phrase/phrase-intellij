@@ -39,20 +39,20 @@ public class PhraseAppToolWindow implements ToolWindowFactory {
     private ActionToolbar createToolbar() {
         DefaultActionGroup group = new DefaultActionGroup();
 
-        PushButton pushB = new PushButton("Push", "", IconLoader.getIcon("/cloud-upload.png"));
+        PushButton pushB = new PushButton("Push", "", IconLoader.getIcon("/icons/cloud-upload.png"));
         group.add(pushB);
 
-        PullButton pullB = new PullButton("Pull", "", IconLoader.getIcon("/cloud-download.png"));
+        PullButton pullB = new PullButton("Pull", "", IconLoader.getIcon("/icons/cloud-download.png"));
         group.add(pullB);
 
         group.addSeparator();
 
-        ConfigAction configB = new ConfigAction("Create Config", "", IconLoader.getIcon("/cog.png"));
+        ConfigAction configB = new ConfigAction("Create Config", "", IconLoader.getIcon("/icons/cog.png"));
         group.add(configB);
 
         group.addSeparator();
 
-        HelpButton helpB = new HelpButton("Help", "", IconLoader.getIcon("/question.png"));
+        HelpButton helpB = new HelpButton("Help", "", IconLoader.getIcon("/icons/question.png"));
         group.add(helpB);
 
         return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, true);
