@@ -39,12 +39,8 @@ public class UploadButton extends AnAction {
 
         final PhraseAppConfiguration configuration = new PhraseAppConfiguration(e.getProject());
         if (!configuration.configExists()) {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "A .phraseapp.yml could not be found. Please use the PhraseApp plugin settings to generate one.", NotificationType.ERROR));
-            return;
-        }
-
-        if (!configuration.hasProjectId() || !configuration.hasAccessToken()) {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please verify that your .phraseapp.yml contains a valid access_token and project_id.", NotificationType.ERROR));
+            ConfigAction ca = new ConfigAction();
+            ca.actionPerformed(e);
             return;
         }
 
