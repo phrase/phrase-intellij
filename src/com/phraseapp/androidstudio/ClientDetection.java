@@ -9,7 +9,8 @@ public class ClientDetection {
 
     private static String[] knownInstallPaths = {
             "/usr/bin/phraseapp",
-            "/usr/local/bin/phraseapp"
+            "/usr/local/bin/phraseapp",
+            System.getProperty("user.home") + "/bin/phraseapp",
     };
 
 
