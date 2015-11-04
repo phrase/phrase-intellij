@@ -11,8 +11,8 @@ import java.awt.*;
 
 public class ColorTextPane extends JTextPane {
     static final Color D_Black   = EditorColorsManager.getInstance().getGlobalScheme().getDefaultForeground();
-    static final Color D_Green   = Color.getHSBColor(0.333f, 1.000f, 0.502f);
-    static final Color D_Red = Color.getHSBColor(0.000f, 1.000f, 0.502f);
+    static final Color D_Green   = Color.getHSBColor(0.333f, 1.000f, 0.502f).brighter();
+    static final Color D_Red = Color.getHSBColor(1.000f, 0.680f, 0.732f);
 
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_GREEN = "\u001B[0;32;1m";
