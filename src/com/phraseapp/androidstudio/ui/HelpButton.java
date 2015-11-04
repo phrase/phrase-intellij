@@ -5,6 +5,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.phraseapp.androidstudio.LinkOpener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,18 +25,7 @@ public class HelpButton extends AnAction {
         super(text, description, icon);
     }
     public void actionPerformed(AnActionEvent e) {
-        if (Desktop.isDesktopSupported()) {
-            try {
-                Desktop.getDesktop().browse(new URI("http://docs.phraseapp.com/guides/setup/android/"));
-            } catch (IOException exc) {
-                exc.printStackTrace();
-            } catch (URISyntaxException exc) {
-                exc.printStackTrace();
-            }
-        } else {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Could not locate browser, please head to http://docs.phraseapp.com/guides/setup/android/", NotificationType.ERROR));
-        }
-
+        LinkOpener.open("http://docs.phraseapp.com/guides/setup/android/");
     }
 
 

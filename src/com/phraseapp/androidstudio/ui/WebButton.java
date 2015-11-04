@@ -5,6 +5,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.phraseapp.androidstudio.LinkOpener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,19 +24,7 @@ public class WebButton extends AnAction {
     }
 
     public void actionPerformed(AnActionEvent e) {
-
-        if (Desktop.isDesktopSupported()) {
-            try {
-                Desktop.getDesktop().browse(new URI("https://phraseapp.com/projects"));
-            } catch (IOException exc) {
-                exc.printStackTrace();
-            } catch (URISyntaxException exc) {
-                exc.printStackTrace();
-            }
-        } else {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Could not locate browser, please head to https://phraseapp.com/", NotificationType.ERROR));
-        }
-
+        LinkOpener.open("https://phraseapp.com/projects");
     }
 
 
