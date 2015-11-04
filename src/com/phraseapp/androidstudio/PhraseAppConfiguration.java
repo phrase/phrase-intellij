@@ -28,7 +28,6 @@ public class PhraseAppConfiguration {
         String projectPath = project.getBasePath();
         try {
             File configFile = new File(projectPath + "/.phraseapp.yml");
-            System.out.println(configFile);
             FileUtils.writeStringToFile(configFile, s);
             LocalFileSystem.getInstance().refreshIoFiles(Collections.singletonList(configFile));
             currentConfig = s;
