@@ -21,7 +21,7 @@ public class PhraseAppConfiguration {
 
     public PhraseAppConfiguration(Project project){
         this.project = project;
-        this.currentConfig = loadPhraseAppConfig();
+        loadPhraseAppConfig();
     }
 
     public void setConfig(String s) {
@@ -44,25 +44,25 @@ public class PhraseAppConfiguration {
         setConfig(writer.toString());
     }
 
-    public String loadPhraseAppConfig() {
+    public void loadPhraseAppConfig() {
         String projectPath = project.getBasePath();
         StringBuilder text = new StringBuilder();
         String NL = System.getProperty("line.separator");
         Scanner scanner = null;
         try {
             scanner = new Scanner(new FileInputStream(projectPath + "/.phraseapp.yml"), "UTF-8");
-        } catch (FileNotFoundException e) {
-            return "";
-        }
-        try {
             while (scanner.hasNextLine()) {
                 text.append(scanner.nextLine() + NL);
             }
+        } catch (FileNotFoundException e) {
+            // Do nothing.
         } finally {
-            scanner.close();
+            if (scanner != null) {
+                scanner.close();
+            }
         }
 
-        return text.toString();
+        this.currentConfig = text.toString();
     }
 
     public String getProjectId() {
@@ -119,13 +119,5 @@ public class PhraseAppConfiguration {
 
     public boolean configExists() {
         return currentConfig.startsWith("phraseapp");
-    }
-
-    public boolean hasProjectId() {
-        return getProjectId() != null;
-    }
-
-    public boolean hasAccessToken() {
-        return getAccessToken() != null;
     }
 }
