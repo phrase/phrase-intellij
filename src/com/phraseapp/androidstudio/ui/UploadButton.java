@@ -31,8 +31,9 @@ public class UploadButton extends AnAction {
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
-        if (PropertiesRepository.getInstance().getClientPath().isEmpty()) {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the 'phraseapp' client in the PhraseApp plugin settings.", NotificationType.ERROR));
+        final String clientPath = PropertiesRepository.getInstance().getClientPath();
+        if (clientPath == null || clientPath.isEmpty()) {
+            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the PhraseApp Client in the PhraseApp plugin settings.", NotificationType.ERROR));
             return;
         }
 

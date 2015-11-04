@@ -24,8 +24,8 @@ public class ConfigAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         String clientPath = PropertiesRepository.getInstance().getClientPath();
 
-        if (clientPath.isEmpty() || !API.validateClient(clientPath)) {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the 'phraseapp' client in the PhraseApp plugin settings.", NotificationType.ERROR));
+        if (clientPath == null || clientPath.isEmpty() || !API.validateClient(clientPath)) {
+            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please configure the path to the PhraseApp client in the PhraseApp plugin settings.", NotificationType.ERROR));
             return;
         }
 

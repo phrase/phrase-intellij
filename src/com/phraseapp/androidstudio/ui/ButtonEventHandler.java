@@ -15,8 +15,8 @@ public class ButtonEventHandler {
     public void handleEvent(final AnActionEvent e, final String clientAction) {
         final String clientPath = PropertiesRepository.getInstance().getClientPath();
 
-        if (clientPath.isEmpty() || !API.validateClient(clientPath)) {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the 'phraseapp' client in the PhraseApp plugin settings.", NotificationType.ERROR));
+        if (clientPath == null || clientPath.isEmpty() || !API.validateClient(clientPath)) {
+            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the PhraseApp Client in the PhraseApp plugin settings.", NotificationType.ERROR));
             return;
         }
 
