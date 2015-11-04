@@ -30,7 +30,7 @@ import java.net.URISyntaxException;
 public class MyPhraseAppConfigurable implements SearchableConfigurable, Configurable.NoScroll {
     private JPanel rootPanel;
     private TextFieldWithBrowseButton clientPathFormattedTextField;
-    private JTextPane infoPane;
+    private InfoPane infoPane;
 
 
     @Override
@@ -56,7 +56,7 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
     public JComponent createComponent() {
         initializeActions();
         detectAndSetClientPath();
-        createHypertext(infoPane, "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a>.</p>");
+        infoPane.setContent("<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a>.</p>");
 
         clientPathFormattedTextField.setText(PropertiesRepository.getInstance().getClientPath());
 
@@ -74,19 +74,6 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
     }
 
 
-    private void createHypertext(JTextPane infoPane, String s) {
-        infoPane.setContentType("text/html");
-        HTMLDocument doc = (HTMLDocument) infoPane.getDocument();
-        HTMLEditorKit editorKit = (HTMLEditorKit) infoPane.getEditorKit();
-        String text = s;
-        try {
-            editorKit.insertHTML(doc, doc.getLength(), text, 0, 0, null);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void initializeActions() {
         final FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false) {
@@ -117,24 +104,7 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
             }
         });
 
-        infoPane.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent event) {
-                handleLinkClick(event);
-            }
-        });
-    }
-
-    private void handleLinkClick(HyperlinkEvent event) {
-        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            try {
-                Desktop.getDesktop().browse(event.getURL().toURI());
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
-            } catch (URISyntaxException e) {
-                JOptionPane.showMessageDialog(rootPanel, "Could not parse to URI " + event.getURL().toString());
-            }
-        }
+        infoPane.initializeActions();
     }
 
 

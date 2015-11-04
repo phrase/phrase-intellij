@@ -12,8 +12,16 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,6 +42,7 @@ public class ProjectConfigDialog extends DialogWrapper {
     private JComboBox projectsComboBox;
     private JComboBox defaultLocaleComboBox;
     private JCheckBox uploadLocalesCheckbox;
+    private InfoPane infoPane;
 
     public ProjectConfigDialog(Project project, String clientPath) {
         super(project);
@@ -43,9 +52,11 @@ public class ProjectConfigDialog extends DialogWrapper {
         this.project = project;
         this.clientPath = clientPath;
 
+        configuration = new PhraseAppConfiguration(project);
+        createInfoText(configuration);
+
         initializeActions();
 
-        configuration = new PhraseAppConfiguration(project);
         accessTokenTextField.setText(configuration.getAccessToken());
     }
 
@@ -97,7 +108,21 @@ public class ProjectConfigDialog extends DialogWrapper {
             }
         });
 
+        infoPane.initializeActions();
+
         accessTokenTextField.requestFocus();
+    }
+
+    private void createInfoText( PhraseAppConfiguration config) {
+        StringBuilder text = new StringBuilder();
+        text.append("<p>This dialog should help you generate a simple PhraseApp configuration file suitable for Android Apps.");
+        text.append(" The generated file can be modified manually to be suitable for more complex situation.</p>");
+
+        if (config.configExists()) {
+            text.append("<p>There already exists a PhraseApp configuration file. It will be overwritten!</p>");
+        }
+
+        infoPane.setContent(text.toString());
     }
 
     public void writeConfigFile() {
