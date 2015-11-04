@@ -44,7 +44,7 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
     @Nullable
     @Override
     public String getHelpTopic() {
-        return "The PhraseApp plugin requires a installed PhraseApp CLI Client and a .phraseapp.yml configuration file";
+        return "The PhraseApp plugin requires a installed PhraseApp CLI Client and a configuration file.";
     }
 
     @Override
@@ -56,7 +56,7 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
     public JComponent createComponent() {
         initializeActions();
         detectAndSetClientPath();
-        createHypertext(infoPane, "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a <b>.phraseapp.yml</b> configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a></p>");
+        createHypertext(infoPane, "<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a>.</p>");
 
         clientPathFormattedTextField.setText(PropertiesRepository.getInstance().getClientPath());
 
@@ -68,7 +68,7 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
             String detected = ClientDetection.findClientInstallation();
             if (detected != null) {
                 PropertiesRepository.getInstance().setClientPath(detected);
-                JOptionPane.showMessageDialog(rootPanel, "We found a PhraseApp client on your system: " + detected);
+                JOptionPane.showMessageDialog(rootPanel, "A PhraseApp client was found on your system: " + detected);
             }
         }
     }
@@ -130,11 +130,9 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
             try {
                 Desktop.getDesktop().browse(event.getURL().toURI());
             } catch (IOException e) {
-                e.printStackTrace();
                 JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
             } catch (URISyntaxException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(rootPanel, "Could not locate browser, please head to " + event.getURL().toString());
+                JOptionPane.showMessageDialog(rootPanel, "Could not parse to URI " + event.getURL().toString());
             }
         }
     }
@@ -149,7 +147,7 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
     @Override
     public void apply() {
         if (clientPathFormattedTextField.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(rootPanel, "Please select the phraseapp client");
+            JOptionPane.showMessageDialog(rootPanel, "Please select the PhraseApp Client");
             return;
         }
 
