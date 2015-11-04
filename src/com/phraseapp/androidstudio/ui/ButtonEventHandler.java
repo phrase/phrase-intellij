@@ -25,7 +25,12 @@ public class ButtonEventHandler {
         if (!configuration.configExists()) {
             ConfigAction ca = new ConfigAction();
             ca.actionPerformed(e);
-            return; // TODO maybe get response config
+            // Validate configuration was properly written.
+            configuration.loadPhraseAppConfig();
+            if (!configuration.configExists()) {
+                Notifications.Bus.notify(new Notification("PhraseApp", "Error", "No PhraseApp configuration found for current project..", NotificationType.ERROR));
+                return;
+            }
         }
 
         PushPullAdapter phraseAppClient = new PushPullAdapter(clientPath, project);

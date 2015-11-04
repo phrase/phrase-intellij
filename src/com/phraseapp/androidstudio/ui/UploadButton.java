@@ -41,7 +41,12 @@ public class UploadButton extends AnAction {
         if (!configuration.configExists()) {
             ConfigAction ca = new ConfigAction();
             ca.actionPerformed(e);
-            return;
+            // Validate configuration was properly written.
+            configuration.loadPhraseAppConfig();
+            if (!configuration.configExists()) {
+                Notifications.Bus.notify(new Notification("PhraseApp", "Error", "No PhraseApp configuration found for current project..", NotificationType.ERROR));
+                return;
+            }
         }
 
         int choice = JOptionPane.showOptionDialog(null,
