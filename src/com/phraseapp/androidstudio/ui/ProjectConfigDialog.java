@@ -115,11 +115,11 @@ public class ProjectConfigDialog extends DialogWrapper {
 
     private void createInfoText( PhraseAppConfiguration config) {
         StringBuilder text = new StringBuilder();
-        text.append("<p>This dialog should help you generate a simple PhraseApp configuration file suitable for Android Apps.");
+        text.append("<p>This dialog should help you generate a basic PhraseApp configuration file suitable for Android Apps.");
         text.append(" The generated file can be modified manually to be suitable for more complex situation.</p>");
 
         if (config.configExists()) {
-            text.append("<p>There already exists a PhraseApp configuration file. It will be overwritten!</p>");
+            text.append("<p>There already exists a PhraseApp configuration file. It will be <em>overwritten</em>!</p>");
         }
 
         infoPane.setContent(text.toString());
