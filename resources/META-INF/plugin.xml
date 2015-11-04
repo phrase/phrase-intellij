@@ -43,7 +43,7 @@
 
     <actions>
         <group id="PhraseAppToolGroup" popup="true" text="PhraseApp" icon="/icons/phrase.png"
-               class="com.phraseapp.androidstudio.ui.PhraseAppToolGroup">
+               class="com.intellij.openapi.actionSystem.DefaultActionGroup">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
 
