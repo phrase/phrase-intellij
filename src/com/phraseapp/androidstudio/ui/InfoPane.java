@@ -3,6 +3,7 @@ package com.phraseapp.androidstudio.ui;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.phraseapp.androidstudio.LinkOpener;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -29,13 +30,7 @@ public class InfoPane extends JTextPane {
 
     private void handleLinkClick(HyperlinkEvent event) {
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            try {
-                Desktop.getDesktop().browse(event.getURL().toURI());
-            } catch (IOException e) {
-                Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Could not locate browser, please head to " + event.getURL().toString(), NotificationType.ERROR));
-            } catch (URISyntaxException e) {
-                Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Could not parse to URI " + event.getURL().toString(), NotificationType.ERROR));
-            }
+            LinkOpener.open(event.getURL().toString());
         }
     }
 

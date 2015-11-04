@@ -18,10 +18,10 @@ public class LinkOpener {
         if (Desktop.isDesktopSupported()) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
-            } catch (IOException exc) {
-                exc.printStackTrace();
-            } catch (URISyntaxException exc) {
-                exc.printStackTrace();
+            } catch (IOException e) {
+                Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Could not locate browser, please head to " + url, NotificationType.ERROR));
+            } catch (URISyntaxException e) {
+                Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Could not parse to URI " + url, NotificationType.ERROR));
             }
         } else {
             Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Could not locate browser, please head to " + url, NotificationType.ERROR));
