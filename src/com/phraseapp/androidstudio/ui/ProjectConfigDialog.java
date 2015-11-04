@@ -5,6 +5,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.ValidationInfo;
 import com.phraseapp.androidstudio.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,6 +50,15 @@ public class ProjectConfigDialog extends DialogWrapper {
     }
 
     @Override
+    protected ValidationInfo doValidate(){
+        if (getSelectedProject().isEmpty()|| getSelectedLocale().isEmpty()) {
+            return new ValidationInfo("Please verify that you have entered a valida access token and selected a project and locale.", accessTokenTextField);
+        }
+
+        return null;
+    }
+
+    @Override
     protected JComponent createCenterPanel() {
         return rootPanel;
     }
@@ -90,23 +100,7 @@ public class ProjectConfigDialog extends DialogWrapper {
         accessTokenTextField.requestFocus();
     }
 
-    public boolean isValid() {
-        if (getSelectedProject() == null || getSelectedLocale() == null) {
-            JOptionPane.showMessageDialog(rootPanel, "Please verify that you have entered a valida access token and selected a project and locale.");
-            return false;
-        }
-
-        // TODO should validate the access token.
-
-        return true;
-    }
-
     public void writeConfigFile() {
-        if (!isValid()) {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Invalid configuration given.", NotificationType.ERROR));
-            return;
-        }
-
         Map<String, Object> cmap = getConfigMap();
         configuration.generateConfig(cmap);
 
