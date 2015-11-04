@@ -1,4 +1,4 @@
-package com.phraseapp.androidstudio.ui;
+package com.phraseapp.androidstudio.actions;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -14,12 +14,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class WebButton extends AnAction {
+public class WebAction extends AnAction {
 
-    public WebButton() {
+    public WebAction() {
     }
 
-    public WebButton(String s, String s1, Icon icon) {
+    public WebAction(String s, String s1, Icon icon) {
         super(s, s1, icon);
     }
 

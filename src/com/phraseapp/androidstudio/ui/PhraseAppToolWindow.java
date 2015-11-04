@@ -10,7 +10,8 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.phraseapp.androidstudio.ConfigAction;
+import com.phraseapp.androidstudio.actions.*;
+import com.phraseapp.androidstudio.actions.PullAction;
 
 /**
  * Created by kolja on 12.10.15.
@@ -39,10 +40,10 @@ public class PhraseAppToolWindow implements ToolWindowFactory {
     private ActionToolbar createToolbar() {
         DefaultActionGroup group = new DefaultActionGroup();
 
-        PushButton pushB = new PushButton("Push", "", IconLoader.getIcon("/icons/cloud-upload.png"));
+        PushAction pushB = new PushAction("Push", "", IconLoader.getIcon("/icons/cloud-upload.png"));
         group.add(pushB);
 
-        PullButton pullB = new PullButton("Pull", "", IconLoader.getIcon("/icons/cloud-download.png"));
+        PullAction pullB = new PullAction("Pull", "", IconLoader.getIcon("/icons/cloud-download.png"));
         group.add(pullB);
 
         group.addSeparator();
@@ -52,10 +53,10 @@ public class PhraseAppToolWindow implements ToolWindowFactory {
 
         group.addSeparator();
 
-        WebButton webB = new WebButton("Translation Center", "", IconLoader.getIcon("/icons/home.png"));
+        WebAction webB = new WebAction("Translation Center", "", IconLoader.getIcon("/icons/home.png"));
         group.add(webB);
 
-        HelpButton helpB = new HelpButton("Help", "", IconLoader.getIcon("/icons/question.png"));
+        HelpAction helpB = new HelpAction("Help", "", IconLoader.getIcon("/icons/question.png"));
         group.add(helpB);
 
         return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, true);

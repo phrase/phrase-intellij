@@ -1,4 +1,4 @@
-package com.phraseapp.androidstudio.ui;
+package com.phraseapp.androidstudio.actions;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -16,12 +16,12 @@ import java.net.URISyntaxException;
 /**
  * Created by gfrey on 02/11/15.
  */
-public class HelpButton extends AnAction {
-    public HelpButton() {
+public class HelpAction extends AnAction {
+    public HelpAction() {
         super();
     }
 
-    public HelpButton(String text, String description, Icon icon) {
+    public HelpAction(String text, String description, Icon icon) {
         super(text, description, icon);
     }
     public void actionPerformed(AnActionEvent e) {

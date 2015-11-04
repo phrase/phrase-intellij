@@ -1,4 +1,4 @@
-package com.phraseapp.androidstudio.ui;
+package com.phraseapp.androidstudio;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -6,12 +6,13 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.phraseapp.androidstudio.*;
+import com.phraseapp.androidstudio.actions.ConfigAction;
 
 
 /**
  * Created by kolja on 12.10.15.
  */
-public class ButtonEventHandler {
+public class ActionEventHandler {
     public void handleEvent(final AnActionEvent e, final String clientAction) {
         final String clientPath = PropertiesRepository.getInstance().getClientPath();
 

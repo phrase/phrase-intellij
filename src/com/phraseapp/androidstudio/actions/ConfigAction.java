@@ -1,10 +1,12 @@
-package com.phraseapp.androidstudio;
+package com.phraseapp.androidstudio.actions;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.phraseapp.androidstudio.API;
+import com.phraseapp.androidstudio.PropertiesRepository;
 import com.phraseapp.androidstudio.ui.ProjectConfigDialog;
 
 import javax.swing.*;

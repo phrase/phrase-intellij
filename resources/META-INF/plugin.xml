@@ -48,35 +48,35 @@
         </group>
 
         <action id="com.phraseapp.androidstudio.PhraseAppPull"
-                class="com.phraseapp.androidstudio.ui.PullButton" text="Pull"
+                class="com.phraseapp.androidstudio.actions.PullAction" text="Pull"
                 description="Pull locales from PhraseApp">
             <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl K"/>
             <add-to-group group-id="PhraseAppToolGroup" anchor="first"/>
         </action>
 
-        <action id="com.phraseapp.androidstudio.PhraseAppPush" class="com.phraseapp.androidstudio.ui.PushButton"
+        <action id="com.phraseapp.androidstudio.PhraseAppPush" class="com.phraseapp.androidstudio.actions.PushAction"
                 text="Push" description="Push locales to PhraseApp">
             <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl J"/>
             <add-to-group group-id="PhraseAppToolGroup" />
         </action>
 
-        <action id="PhraseAppConfig" class="com.phraseapp.androidstudio.ConfigAction" text="Create Config">
+        <action id="PhraseAppConfig" class="com.phraseapp.androidstudio.actions.ConfigAction" text="Create Config">
             <add-to-group group-id="PhraseAppToolGroup" anchor="last"/>
         </action>
 
-        <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.ui.WebButton"
+        <action id="com.phraseapp.androidstudio.PhraseAppWeb" class="com.phraseapp.androidstudio.actions.WebAction"
                 text="Open Translation Center"
                 description="Open the PhraseApp Translation Center in your browser">
             <add-to-group group-id="PhraseAppToolGroup" anchor="last"/>
         </action>
 
-        <action id="com.phraseapp.androidstudio.PhraseAppHelp" class="com.phraseapp.androidstudio.ui.HelpButton"
+        <action id="com.phraseapp.androidstudio.PhraseAppHelp" class="com.phraseapp.androidstudio.actions.HelpAction"
                 text="Help"
                 description="Open the PhraseApp Help">
             <add-to-group group-id="PhraseAppToolGroup" anchor="last"/>
         </action>
 
-        <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.ui.UploadButton"
+        <action id="com.phraseapp.androidstudio.PhraseAppUpload" class="com.phraseapp.androidstudio.actions.UploadAction"
                 text="Upload Locale" icon="/icons/phrase_13x13.png"
                 description="Upload Locale to PhraseApp">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>

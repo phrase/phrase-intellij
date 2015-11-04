@@ -1,4 +1,4 @@
-package com.phraseapp.androidstudio.ui;
+package com.phraseapp.androidstudio.actions;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.phraseapp.androidstudio.*;
+import com.phraseapp.androidstudio.ui.ColorTextPane;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -15,7 +16,7 @@ import javax.swing.*;
 /**
  * Created by kolja on 26.10.15.
  */
-public class UploadButton extends AnAction {
+public class UploadAction extends AnAction {
 
     @Override
     public void update(AnActionEvent e) {
