@@ -23,6 +23,8 @@ Besides client path configuration each project needs a configuration, too. A bas
 * The project to use: After the Access Token was specified the project list will be updated. If there is no project in your account one can be generated automatically (named after the Android Studio project).
 * The key's locale: The locale the keys are in your project are in.
 
+For more information on the configuration file check out [this documentation page](http://docs.phraseapp.com/developers/cli/configuration/).
+
 
 ### Usage
 
@@ -30,9 +32,12 @@ There are two major actions the plugin can be used for:
 
 * Pushing the current keys file to PhraseApp.
 * Pulling the translations from PhraseApp to your project.
-* Upload single files to PhraseApp.
 
- 
+Both are accessible from the menubar (under *Tools -> PhraseApp*) and the tool window (located to the right of the editor window).
+
+Valid locale files (named `strings.xml`) can be manually uploaded from the respective context menu in the project view.
+
+
 ### Plugin development
 
 See [Plugin development](DEV.md) for more information.
