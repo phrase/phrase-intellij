@@ -4,7 +4,7 @@ import com.intellij.ide.util.PropertiesComponent;
 
 
 public class PropertiesRepository {
-    public static final String PHRASEAPP_CLIENT_PATH = "PHRASEAPP_CLIENT_PATH";
+    public static final String PHRASEAPP_CLIENT_PATH = "com.phraseapp.client_path";
 
     private static PropertiesRepository instance;
     private PropertiesRepository() {}
