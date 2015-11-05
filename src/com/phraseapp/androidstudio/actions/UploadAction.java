@@ -34,7 +34,7 @@ public class UploadAction extends AnAction {
     public void actionPerformed(final AnActionEvent e) {
         final String clientPath = PropertiesRepository.getInstance().getClientPath();
         if (clientPath == null || clientPath.isEmpty()) {
-            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the PhraseApp Client in the PhraseApp plugin settings.", NotificationType.ERROR));
+            Notifications.Bus.notify(new Notification("PhraseApp", "Error", "Please choose the PhraseApp client in the PhraseApp plugin settings.", NotificationType.ERROR));
             return;
         }
 
