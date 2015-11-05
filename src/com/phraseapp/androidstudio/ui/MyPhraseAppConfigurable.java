@@ -18,6 +18,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
@@ -31,6 +32,8 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
     private JPanel rootPanel;
     private TextFieldWithBrowseButton clientPathFormattedTextField;
     private InfoPane infoPane;
+
+    private boolean modified = false;
 
 
     @Override
@@ -49,31 +52,27 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
 
     @Override
     public void reset() {
+        String clientPath = PropertiesRepository.getInstance().getClientPath();
+        if (clientPath == null || clientPath.isEmpty()) {
+            String guessedClientPath = ClientDetection.findClientInstallation();
+            if (guessedClientPath != null) {
+                clientPathFormattedTextField.setText(guessedClientPath);
+                modified = true;
+                JOptionPane.showMessageDialog(rootPanel, "A PhraseApp client was found at: " + guessedClientPath);
+            }
+        } else {
+            clientPathFormattedTextField.setText(clientPath);
+            modified = false;
+        }
     }
 
     @Nullable
     @Override
     public JComponent createComponent() {
         initializeActions();
-        detectAndSetClientPath();
         infoPane.setContent("<p>The PhraseApp plugin requires a installed <b>PhraseApp Client</b> and a configuration file. <a href=http://docs.phraseapp.com/developers/android_studio>Learn more</a>.</p>");
-
-        clientPathFormattedTextField.setText(PropertiesRepository.getInstance().getClientPath());
-
         return rootPanel;
     }
-
-    private void detectAndSetClientPath() {
-        if (PropertiesRepository.getInstance().getClientPath() == null) {
-            String detected = ClientDetection.findClientInstallation();
-            if (detected != null) {
-                PropertiesRepository.getInstance().setClientPath(detected);
-                JOptionPane.showMessageDialog(rootPanel, "A PhraseApp client was found on your system: " + detected);
-            }
-        }
-    }
-
-
 
     private void initializeActions() {
         final FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false) {
@@ -83,24 +82,23 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
         };
         clientPathFormattedTextField.addBrowseFolderListener("Choose PhraseApp Client", "", null, fileChooserDescriptor);
 
-        JTextField clientPathTextField = clientPathFormattedTextField.getTextField();
+        final JTextField clientPathTextField = clientPathFormattedTextField.getTextField();
         clientPathTextField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
-                handleClientValidation();
+                handleUpdate();
             }
 
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
-                handleClientValidation();
+                handleUpdate();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-            }
+            public void changedUpdate(DocumentEvent e) {}
 
-            private void handleClientValidation() {
-               API.validateClient(getClientPath());
+            private void handleUpdate() {
+                modified = true;
             }
         });
 
@@ -116,17 +114,13 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
 
     @Override
     public void apply() {
-        if (clientPathFormattedTextField.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(rootPanel, "Please select the PhraseApp Client");
-            return;
-        }
-
         PropertiesRepository.getInstance().setClientPath(getClientPath());
+        modified = false;
     }
 
     @Override
     public boolean isModified() {
-        return true;
+        return modified;
     }
 
 
