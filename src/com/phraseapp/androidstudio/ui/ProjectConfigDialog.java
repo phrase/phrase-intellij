@@ -52,7 +52,7 @@ public class ProjectConfigDialog extends DialogWrapper {
     @Override
     protected ValidationInfo doValidate(){
         if (getSelectedProject().isEmpty()|| getSelectedLocale().isEmpty()) {
-            return new ValidationInfo("Please verify that you have entered a valida access token and selected a project and locale.", accessTokenTextField);
+            return new ValidationInfo("Please verify that you have entered a valid access token and selected a project and locale.", accessTokenTextField);
         }
 
         return null;
@@ -108,7 +108,7 @@ public class ProjectConfigDialog extends DialogWrapper {
         text.append(" The generated file can be modified manually to be suitable for more complex situation.</p>");
 
         if (config.configExists()) {
-            text.append("<p>There already exists a PhraseApp configuration file. It will be <em>overwritten</em>!</p>");
+            text.append("<p>There already exists a PhraseApp configuration file. It will be <b>overwritten</b>!</p>");
         }
 
         infoPane.setContent(text.toString());
