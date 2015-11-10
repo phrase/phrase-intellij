@@ -5,7 +5,6 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.phraseapp.androidstudio.API;
 import com.phraseapp.androidstudio.ClientDetection;
 import com.phraseapp.androidstudio.PropertiesRepository;
 import org.jetbrains.annotations.Nls;
@@ -15,15 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-import java.awt.*;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Created by gfrey on 22/10/15.

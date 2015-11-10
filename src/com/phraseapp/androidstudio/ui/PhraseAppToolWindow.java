@@ -11,7 +11,6 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.phraseapp.androidstudio.actions.*;
-import com.phraseapp.androidstudio.actions.PullAction;
 
 /**
  * Created by kolja on 12.10.15.

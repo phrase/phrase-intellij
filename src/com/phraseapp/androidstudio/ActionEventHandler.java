@@ -5,7 +5,6 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.phraseapp.androidstudio.*;
 import com.phraseapp.androidstudio.actions.ConfigAction;
 
 

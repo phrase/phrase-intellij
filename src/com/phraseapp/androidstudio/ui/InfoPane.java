@@ -1,8 +1,5 @@
 package com.phraseapp.androidstudio.ui;
 
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.phraseapp.androidstudio.LinkOpener;
 
 import javax.swing.*;
@@ -11,9 +8,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import java.awt.*;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Created by gfrey on 04/11/15.
