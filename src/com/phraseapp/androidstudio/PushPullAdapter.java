@@ -5,10 +5,12 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessListener;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.phraseapp.androidstudio.ui.ColorTextPane;
@@ -18,6 +20,8 @@ import java.awt.*;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by kolja on 15.10.15.
@@ -60,6 +64,14 @@ public class PushPullAdapter {
             GeneralCommandLine gcl = new GeneralCommandLine(clientPath,
                     clientAction);
             gcl.withWorkDirectory(projectPath);
+
+            Map env = new HashMap<String, String>();
+            PluginId pluginId = com.intellij.ide.plugins.PluginManager.getPluginByClassName(getClass().getName());
+            IdeaPluginDescriptor pluginDescriptor = com.intellij.ide.plugins.PluginManager.getPlugin(pluginId);
+            env.put("PHRASEAPP_USER_AGENT", "AndroidStudio " + pluginDescriptor.getVersion());
+            gcl.withEnvironment(env);
+
+
             final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
             processHandler.addProcessListener(new ProcessListener() {
                 @Override
