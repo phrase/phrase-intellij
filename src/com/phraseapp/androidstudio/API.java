@@ -94,10 +94,9 @@ public class API {
             final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
 
             ProcessOutput output = processHandler.runProcess();
-            String error = output.getStderr();
 
-            if(!error.isEmpty()){
-
+            if(output.getExitCode() != 0){
+                String error = output.getStderr();
                 resourceList.addError(error);
                 return resourceList;
             }
