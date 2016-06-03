@@ -11,12 +11,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Shows Config dialog
+ * Shows Config dialog and creates config file
  *
  * Created by gfrey on 30/10/15.
  */
@@ -57,7 +58,7 @@ public class ProjectConfigDialog extends DialogWrapper {
 
     @Override
     protected ValidationInfo doValidate(){
-        if (getSelectedProject().isEmpty()|| getSelectedLocale().isEmpty()) {
+        if (getSelectedProject().isEmpty()|| getSelectedLocaleId().isEmpty()) {
             return new ValidationInfo("Please verify that you have entered a valid access token and selected a project and locale.", accessTokenTextField);
         }
 
@@ -233,7 +234,7 @@ public class ProjectConfigDialog extends DialogWrapper {
         return project.getId();
     }
 
-    private String getSelectedLocale() {
+    private String getSelectedLocaleId() {
         if (defaultLocaleComboBox.getSelectedIndex() == -1) {
             return "";
         }
@@ -294,7 +295,7 @@ public class ProjectConfigDialog extends DialogWrapper {
         Map<String, Object> pushFile = new HashMap<String, Object>();
         Map<String, Object> pushParams = new HashMap<String, Object>();
 
-        pushParams.put("locale_id", getSelectedLocale());
+        pushParams.put("locale_id", getSelectedLocaleId());
         pushFile.put("params", pushParams);
 
         pushFile.put("file", defaultLocalePath);
@@ -305,20 +306,37 @@ public class ProjectConfigDialog extends DialogWrapper {
 
     private Map<String, Object> getPullConfig() {
         Map<String, Object> pull = new HashMap<String, Object>();
-        Map<String, Object> pullFile = new HashMap<String, Object>();
-        Map<String, Object> pullParams = new HashMap<String, Object>();
 
-        pullParams.put("locale_id", getSelectedLocale());
-        pullFile.put("params", pullParams);
-
-        pullFile.put("file", defaultLocalePath);
-        pull.put("targets", new Map[]{pullFile});
+        pull.put("targets", getAllPullFiles());
 
         return pull;
     }
 
-    private String getPullPath(String defaultLocalePath) {
-        return defaultLocalePath.replaceAll("values", "values-<locale_name>");
+    private ArrayList<Map<String,Object>> getAllPullFiles() {
+        ArrayList<Map<String,Object>> files = new ArrayList<Map<String,Object>>();
+
+        for (int i = 0; i < locales.getSize(); i++) {
+            Map<String, Object> pullFile = new HashMap<String, Object>();
+            Map<String, Object> pullParams = new HashMap<String, Object>();
+            APIResource model = locales.getModelAt(i);
+            String path;
+            if (getSelectedLocaleId().equals(model.getId())) {
+                path = defaultLocalePath;
+            } else {
+                path = getPullPathForLocaleName(model.getName());
+            }
+
+            pullParams.put("locale_id", model.getId());
+            pullFile.put("params", pullParams);
+            pullFile.put("file", path);
+
+            files.add(pullFile);
+        }
+
+        return files;
+    }
+
+    private String getPullPathForLocaleName(String localeName) {
+        return defaultLocalePath.replaceAll("values", "values-"+localeName);
     }
 }
-
