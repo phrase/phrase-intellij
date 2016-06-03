@@ -16,9 +16,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * Shows Config dialog
+ *
  * Created by gfrey on 30/10/15.
  */
 public class ProjectConfigDialog extends DialogWrapper {
+
+
+    private final String defaultLocalePath = "./app/src/main/res/values/strings.xml";
+
     private Project project = null;
     private PhraseAppConfiguration configuration;
     private String clientPath;
@@ -183,6 +189,7 @@ public class ProjectConfigDialog extends DialogWrapper {
             locales = api.getLocales(getSelectedProject());
             if (locales.isValid()) {
                 if (locales.isEmpty()) {
+                    // TODO hacky hacky: whole flow of creating new locales should be reviewed
                     String[] localesList = {"en", "de", "fr", "es", "it", "pt", "zh"};
 
                     String localeName = (String) JOptionPane.showInputDialog(rootPanel,
@@ -271,23 +278,9 @@ public class ProjectConfigDialog extends DialogWrapper {
     private Map<String, Object> getConfigMap() {
         Map<String, Object> base = new HashMap<String, Object>();
         Map<String, Object> root = new TreeMap<String, Object>();
-        Map<String, Object> pull = new HashMap<String, Object>();
-        Map<String, Object> push = new HashMap<String, Object>();
-        Map<String, Object> pullFile = new HashMap<String, Object>();
-        Map<String, Object> pushFile = new HashMap<String, Object>();
-        Map<String, Object> pushParams = new HashMap<String, Object>();
 
-        pushParams.put("locale_id", getSelectedLocale());
-        pushFile.put("params", pushParams);
-        String defaultLocalePath = "./app/src/main/res/values/strings.xml";
-        pushFile.put("file", defaultLocalePath);
-        pullFile.put("file", getPullPath(defaultLocalePath));
-
-        push.put("sources", new Map[]{pushFile});
-        pull.put("targets", new Map[]{pullFile});
-
-        root.put("push", push);
-        root.put("pull", pull);
+        root.put("push", getPushConfig());
+        root.put("pull", getPullConfig());
         root.put("project_id", getSelectedProject());
         root.put("access_token", getAccessToken());
         root.put("file_format", "xml");
@@ -296,6 +289,33 @@ public class ProjectConfigDialog extends DialogWrapper {
         return base;
     }
 
+    private Map<String, Object> getPushConfig() {
+        Map<String, Object> push = new HashMap<String, Object>();
+        Map<String, Object> pushFile = new HashMap<String, Object>();
+        Map<String, Object> pushParams = new HashMap<String, Object>();
+
+        pushParams.put("locale_id", getSelectedLocale());
+        pushFile.put("params", pushParams);
+
+        pushFile.put("file", defaultLocalePath);
+        push.put("sources", new Map[]{pushFile});
+
+        return push;
+    }
+
+    private Map<String, Object> getPullConfig() {
+        Map<String, Object> pull = new HashMap<String, Object>();
+        Map<String, Object> pullFile = new HashMap<String, Object>();
+        Map<String, Object> pullParams = new HashMap<String, Object>();
+
+        pullParams.put("locale_id", getSelectedLocale());
+        pullFile.put("params", pullParams);
+
+        pullFile.put("file", defaultLocalePath);
+        pull.put("targets", new Map[]{pullFile});
+
+        return pull;
+    }
 
     private String getPullPath(String defaultLocalePath) {
         return defaultLocalePath.replaceAll("values", "values-<locale_name>");
