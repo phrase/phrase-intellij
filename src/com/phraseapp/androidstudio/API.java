@@ -120,15 +120,20 @@ public class API {
 
                 for (int i = 0; i < objects.length(); i++) {
                     JSONObject pro = (JSONObject) objects.get(i);
-                    resourceList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
+
+                    if (pro.has("code")) {
+                        resourceList.addElement(new APIResource(pro.getString("id"), pro.getString("name"), pro.getString("code")));
+                    } else {
+                        resourceList.addElement(new APIResource(pro.getString("id"), pro.getString("name")));
+                    }
                 }
             } else if (response.startsWith("{")) {
                 JSONObject object = new JSONObject(response);
                 if (object.has("name")) {
-                    resourceList.addElement(new APIResource((String) object.get("id"), (String) object.get("name")));
+                    resourceList.addElement(new APIResource(object.getString("id"), object.getString("name")));
 
                 } else {
-                    resourceList.addElement(new APIResource((String) object.get("id"), null));
+                    resourceList.addElement(new APIResource(object.getString("id"), null));
                 }
             } else {
                 return null;

@@ -323,7 +323,7 @@ public class ProjectConfigDialog extends DialogWrapper {
             if (getSelectedLocaleId().equals(model.getId())) {
                 path = defaultLocalePath;
             } else {
-                path = getPullPathForLocaleName(model.getName());
+                path = getPullPathForLocale(model);
             }
 
             pullParams.put("locale_id", model.getId());
@@ -336,7 +336,25 @@ public class ProjectConfigDialog extends DialogWrapper {
         return files;
     }
 
-    private String getPullPathForLocaleName(String localeName) {
-        return defaultLocalePath.replaceAll("values", "values-"+localeName);
+    private String getLocaleCode(APIResource locale) {
+
+        if (locale.getCode() != null) {
+            String localeCode = locale.getCode();
+
+            if (localeCode.contains("-")) {
+                String[] splittedLocale = localeCode.split("-");
+                localeCode = splittedLocale[0] + "-r" + splittedLocale[1];
+            }
+
+            return localeCode;
+        } else {
+            return locale.getName();
+        }
+    }
+
+    private String getPullPathForLocale(APIResource locale) {
+        String localeCode =getLocaleCode(locale);
+
+        return defaultLocalePath.replaceAll("values", "values-"+localeCode);
     }
 }
