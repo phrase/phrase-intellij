@@ -95,14 +95,17 @@ public class API {
 
             ProcessOutput output = processHandler.runProcess();
 
-            if(output.getExitCode() != 0){
+            if (output.getExitCode() != 0) {
                 String error = output.getStderr();
                 resourceList.addError(error);
                 return resourceList;
             }
 
             final String response = output.getStdout();
-            APIResourceListModel resources = handleResponse(response);
+            APIResourceListModel resources = null;
+            if (!response.isEmpty()) {
+                resources = handleResponse(response);
+            }
 
             return resources;
         } catch (ExecutionException e) {
@@ -112,31 +115,25 @@ public class API {
     }
 
     private APIResourceListModel handleResponse(String response) {
-        if (!response.isEmpty()) {
-            APIResourceListModel resourceList = new APIResourceListModel();
+        APIResourceListModel resourceList = new APIResourceListModel();
 
-            if (response.startsWith("[")) {
-                JSONArray objects = new JSONArray(response);
+        if (response.startsWith("[")) {
+            JSONArray jsonArray = new JSONArray(response);
 
-                for (int i = 0; i < objects.length(); i++) {
-                    JSONObject pro = (JSONObject) objects.get(i);
-                    resourceList.addElement(new APIResource((String) pro.get("id"), (String) pro.get("name")));
-                }
-            } else if (response.startsWith("{")) {
-                JSONObject object = new JSONObject(response);
-                if (object.has("name")) {
-                    resourceList.addElement(new APIResource((String) object.get("id"), (String) object.get("name")));
-
-                } else {
-                    resourceList.addElement(new APIResource((String) object.get("id"), null));
-                }
-            } else {
-                return null;
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                resourceList.addElement(new APIResource(jsonObject));
             }
 
-            return resourceList;
+        } else if (response.startsWith("{")) {
+            JSONObject jsonObject = new JSONObject(response);
+            resourceList.addElement(new APIResource(jsonObject));
+
+        } else {
+            return null;
         }
-        return null;
+
+        return resourceList;
     }
 
     public static boolean validateClient(String path) {
