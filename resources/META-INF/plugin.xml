@@ -9,6 +9,8 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      Version 3.4<br/>
+      <em>- optimize initialization of the phrase app plugin. Region codes are now correctly handled.</em><br/>
       Version 3.3<br/>
       <em>- fixes a problem with older java versions</em><br/>
       Version 3.2<br/>
