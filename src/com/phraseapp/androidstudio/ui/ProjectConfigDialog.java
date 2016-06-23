@@ -190,7 +190,7 @@ public class ProjectConfigDialog extends DialogWrapper {
             locales = api.getLocales(getSelectedProject());
             if (locales.isValid()) {
                 if (locales.isEmpty()) {
-                    // TODO hacky hacky: whole flow of creating new locales should be reviewed
+                    // @TODO - enhance list of initial locale choices
                     String[] localesList = {"en", "de", "fr", "es", "it", "pt", "zh"};
 
                     String localeName = (String) JOptionPane.showInputDialog(rootPanel,
