@@ -27,14 +27,67 @@ public class API {
 
     // Get all locales
     public APIResourceListModel getLocales(String projectId) {
+        APIResourceListModel locales = getLocalePage(projectId, 0);
+        if (locales.isEmpty()) {
+            return locales;
+        }
+
+        for (int page = 1; page < 100; page++) {
+            APIResourceListModel newLocales = getLocalePage(projectId, page);
+            if (newLocales.isEmpty()) {
+                break;
+            }
+
+            for (int i = 0; i < newLocales.getSize(); i++) {
+                APIResource locale = newLocales.getModelAt(i);
+                locales.addElement(locale);
+            }
+        }
+
+        return locales;
+    }
+
+    private APIResourceListModel getLocalePage(String projectId, int page) {
         List<String> params = new ArrayList<String>();
         params.add(projectId);
-        return runCommand("locales", "list", params);
+        params.add("--per-page");
+        params.add("100");
+        params.add("--page");
+        params.add("" + page);
+        APIResourceListModel locales = runCommand("locales", "list", params);
+        return locales;
     }
 
     // Get all projects
     public APIResourceListModel getProjects() {
-        return runCommand("projects", "list", null);
+        APIResourceListModel projects = getProjectPage(0);
+        if (projects.isEmpty()) {
+            return projects;
+        }
+
+        for (int page = 1; page < 100; page++) {
+            APIResourceListModel newProjects = getProjectPage(page);
+            if (newProjects.isEmpty()) {
+                break;
+            }
+
+            for (int i = 0; i < newProjects.getSize(); i++) {
+                APIResource project = newProjects.getModelAt(i);
+                projects.addElement(project);
+            }
+        }
+
+        return projects;
+    }
+
+    private APIResourceListModel getProjectPage(int page) {
+        List<String> params = new ArrayList<String>();
+        params.add("--per-page");
+        params.add("100");
+        params.add("--page");
+        params.add("" + page);
+        APIResourceListModel projects = runCommand("projects", "list", params);
+        return projects;
     }
 
     // Create project
@@ -58,8 +111,8 @@ public class API {
         return runCommand("locale", "create", params);
     }
 
-
-    public APIResourceListModel uploadLocale(String projectId, String localeId, String file, String fileformat, String updateTranslations) {
+    public APIResourceListModel uploadLocale(String projectId, String localeId, String file, String fileformat,
+            String updateTranslations) {
         List<String> params = new ArrayList<String>();
         params.add(projectId);
         params.add("--locale-id");
@@ -77,10 +130,8 @@ public class API {
     private APIResourceListModel runCommand(String resource, String action, List<String> params) {
         APIResourceListModel resourceList = new APIResourceListModel();
 
-        GeneralCommandLine gcl = new GeneralCommandLine(clientPath,
-                resource);
+        GeneralCommandLine gcl = new GeneralCommandLine(clientPath, resource);
         gcl.addParameter(action);
-
 
         if (params != null) {
             gcl.addParameters(params);
@@ -91,7 +142,8 @@ public class API {
         gcl.withWorkDirectory(workingDir);
 
         try {
-            final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
+            final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(),
+                    Charset.defaultCharset(), gcl.getCommandLineString());
 
             ProcessOutput output = processHandler.runProcess();
 
@@ -140,7 +192,8 @@ public class API {
         GeneralCommandLine gcl = new GeneralCommandLine(path, "info");
         final CapturingProcessHandler processHandler;
         try {
-            processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
+            processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(),
+                    gcl.getCommandLineString());
             ProcessOutput output = processHandler.runProcess();
             String response = output.getStdout();
             return response.toLowerCase().contains("phraseapp client version");
@@ -149,6 +202,5 @@ public class API {
 
         return false;
     }
-
 
 }
