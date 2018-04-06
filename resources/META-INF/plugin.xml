@@ -9,6 +9,8 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      Version 3.4.1<br/>
+      <em>- List more than 25 projects and locales</em><br/>
       Version 3.4<br/>
       <em>- optimize initialization of the phrase app plugin. Region codes are now correctly handled.</em><br/>
       Version 3.3<br/>
