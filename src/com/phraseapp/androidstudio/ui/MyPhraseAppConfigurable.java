@@ -60,7 +60,7 @@ public class MyPhraseAppConfigurable implements SearchableConfigurable, Configur
     @Override
     public JComponent createComponent() {
         initializeActions();
-        infoPane.setContent("<p>The PhraseApp plugin requires the <b>PhraseApp CLI client</b> and a configuration file. <a href=https://phraseapp.com/docs/guides/setup/android/>Learn more</a>.</p>");
+        infoPane.setContent("<p>The PhraseApp plugin requires the <b>PhraseApp CLI client</b> and a configuration file. <a href=https://help.phraseapp.com/setup/set-up-phraseapp-for-app-translation/android-android-studio>Learn more</a>.</p>");
         return rootPanel;
     }
 
