@@ -18,7 +18,7 @@ public class HelpAction extends AnAction {
         super(text, description, icon);
     }
     public void actionPerformed(AnActionEvent e) {
-        LinkOpener.open("http://docs.phraseapp.com/guides/setup/android/");
+        LinkOpener.open("https://help.phraseapp.com/setup/set-up-phraseapp-for-app-translation/android-android-studio");
     }
 
 
