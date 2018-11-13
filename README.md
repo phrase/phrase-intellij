@@ -24,7 +24,7 @@ Besides client path configuration each project needs a configuration, too. A bas
 
 ![PhraseApp configuration generation for Android](generate_config.png)
 
-You can of course create your own file, or modify the generated one to your needs. For more information on the configuration file check out [this documentation page](http://docs.phraseapp.com/developers/cli/configuration/).
+You can of course create your own file, or modify the generated one to your needs. For more information on the configuration file check out [this documentation page](https://help.phraseapp.com/phraseapp-for-developers/phraseapp-client/configuration).
 
 
 ### Usage
