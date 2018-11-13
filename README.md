@@ -4,7 +4,7 @@ Phrase-AndroidStudio is a plugin for Android Studio, the official Android IDE fr
 
 ### PhraseApp
 
-PhraseApp helps you manage translations. With this plugin it is integrated tightly into Android Studio. Read more about Android app localization and PhraseApp integration [in our blog post.](http://localize-software.phraseapp.com/posts/android-how-to-translate-apps-in-android-studio/)
+PhraseApp helps you manage translations. With this plugin it is integrated tightly into Android Studio. Read more about Android app localization and PhraseApp integration [in our blog post.](https://phraseapp.com/blog/posts/android-how-to-translate-apps-in-android-studio/)
 
 
 ### Download and Installation
