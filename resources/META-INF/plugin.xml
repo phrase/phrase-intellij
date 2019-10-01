@@ -2,10 +2,10 @@
     <id>com.phraseapp.androidstudio</id>
     <name>PhraseApp</name>
     <version>3.5.1</version>
-    <vendor email="support@phraseapp.com" url="https://www.phraseapp.com">PhraseApp</vendor>
+    <vendor email="support@phrase.com" url="https://www.phrase.com">Phrase</vendor>
 
     <description><![CDATA[
-      PhraseApp helps you manage Translations in your Android Studio projects.
+      Phrase helps you manage Translations in your Android Studio projects.
     ]]></description>
 
     <change-notes><![CDATA[
@@ -16,7 +16,7 @@
       Version 3.3<br/>
       <em>- fixes a problem with older java versions</em><br/>
       Version 3.2<br/>
-      <em>- fixes a problem with older version of the PhraseApp Client</em><br/>
+      <em>- fixes a problem with older version of the Phrase Client</em><br/>
       Version 3.1<br/>
       <em>- internal improvements</em><br/>
       Version 3.0<br/>
@@ -28,7 +28,7 @@
       Version 2.1<br/>
       <em>- fixes a problem when Android-style locale-culture codes (e.g. "pl-rPL") are used</em><br/>
       Version 2.0<br/>
-      <em>- support for PhraseApp API v2</em><br/>
+      <em>- support for Phrase API v2</em><br/>
     ]]>
     </change-notes>
 
