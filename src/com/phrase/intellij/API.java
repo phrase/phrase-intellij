@@ -205,4 +205,18 @@ public class API {
         return false;
     }
 
+    public static boolean isLegacyClient(String path) {
+        GeneralCommandLine gcl = new GeneralCommandLine(path, "info");
+        final CapturingProcessHandler processHandler;
+        try {
+            processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(),
+                    gcl.getCommandLineString());
+            ProcessOutput output = processHandler.runProcess();
+            String response = output.getStdout();
+            return response.toLowerCase().contains("phraseapp client version");
+        } catch (ExecutionException e) {
+        }
+
+        return false;
+    }
 }

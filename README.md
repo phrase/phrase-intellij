@@ -1,6 +1,6 @@
-# Phrase-AndroidStudio
+# phrase-intellij
 
-Phrase-AndroidStudio is a plugin for Android Studio, the official Android IDE from Google.
+Plugin to sync translations with Phrase for Android Studio and IntelliJ.
 
 ### Phrase
 

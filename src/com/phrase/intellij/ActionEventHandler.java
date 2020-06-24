@@ -15,10 +15,17 @@ public class ActionEventHandler {
     public void handleEvent(final AnActionEvent e, final String clientAction) {
         final String clientPath = PropertiesRepository.getInstance().getClientPath();
 
+
+        if (clientPath != null && !clientPath.isEmpty() && API.isLegacyClient(clientPath)) {
+            Notifications.Bus.notify(new Notification("Phrase", "Error", "The client is no longer supported. Please upgrade to the new version https://github.com/phrase/phrase-cli.", NotificationType.ERROR));
+            return;
+        }
+
         if (clientPath == null || clientPath.isEmpty() || !API.validateClient(clientPath)) {
             Notifications.Bus.notify(new Notification("Phrase", "Error", "Please choose a valid Phrase client in the Phrase plugin settings.", NotificationType.ERROR));
             return;
         }
+
 
         Project project = e.getProject();
         PhraseConfiguration configuration = new PhraseConfiguration(e.getProject());
