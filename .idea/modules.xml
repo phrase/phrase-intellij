@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PhraseApp.iml" filepath="$PROJECT_DIR$/PhraseApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Phrase.iml" filepath="$PROJECT_DIR$/Phrase.iml" />
     </modules>
   </component>
 </project>
