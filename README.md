@@ -1,6 +1,6 @@
-# Phrase-AndroidStudio
+# phrase-intellij
 
-Phrase-AndroidStudio is a plugin for Android Studio, the official Android IDE from Google.
+Plugin to sync translations with Phrase for Android Studio.
 
 ### Phrase
 
@@ -14,7 +14,7 @@ Go to the plugin settings page (**File > Settings > Plugins** on Windows and Lin
 
 ### Configuration
 
-The plugin relies on the [Phrase CLI client](https://github.com/phrase/phraseapp-client), i.e. it must be [installed](https://github.com/phrase/phraseapp-client#1-install) first. The client path (the location the binary is found at) must be specified in the **Tools > Phrase** settings (or preferences on MacOS X) dialog. This dialog will try to determine the path using some heuristics, but it might be necessary to specify the path manually.
+The plugin relies on the [Phrase CLI client](https://github.com/phrase/phrase-cli), i.e. it must be [installed](https://github.com/phrase/phrase-cli#1-install) first. The client path (the location the binary is found at) must be specified in the **Tools > Phrase** settings (or preferences on MacOS X) dialog. This dialog will try to determine the path using some heuristics, but it might be necessary to specify the path manually.
 
 Besides client path configuration each project needs a configuration, too. A basic configuration can be generated using the **Tools > Phrase > Create Config** dialog (it will pop up automatically if any action requiring the configuration is triggered, but it wasn't created yet). The following values must be specified:
 
@@ -24,7 +24,7 @@ Besides client path configuration each project needs a configuration, too. A bas
 
 ![Phrase configuration generation for Android](generate_config.png)
 
-You can of course create your own file, or modify the generated one to your needs. For more information on the configuration file check out [this documentation page](https://help.phrase.com/phraseapp-for-developers/phraseapp-client/configuration).
+You can of course create your own file, or modify the generated one to your needs. For more information on the configuration file check out [this documentation page](https://help.phrase.com/help/phrase-for-developers).
 
 
 ### Usage
