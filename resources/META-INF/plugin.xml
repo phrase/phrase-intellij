@@ -5,7 +5,7 @@
     <vendor email="support@phrase.com" url="https://www.phrase.com">Phrase</vendor>
 
     <description><![CDATA[
-      Phrase helps you manage Translations in your Android Studio projects.
+      Phrase helps you manage Translations in your Android Studio projects. The plugin only support CLI v2 https://github.com/phrase/phrase-cli
     ]]></description>
 
     <change-notes><![CDATA[

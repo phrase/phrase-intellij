@@ -1,6 +1,6 @@
 # phrase-intellij
 
-Plugin to sync translations with Phrase for Android Studio and IntelliJ.
+Plugin to sync translations with Phrase for Android Studio.
 
 ### Phrase
 
