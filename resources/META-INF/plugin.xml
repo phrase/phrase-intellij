@@ -5,10 +5,12 @@
     <vendor email="support@phrase.com" url="https://www.phrase.com">Phrase</vendor>
 
     <description><![CDATA[
-      Phrase helps you manage Translations in your Android Studio projects.
+      Phrase helps you manage Translations in your Android Studio projects. This plugin only supports v1 versions of the client. Please install the new plugin Phrase for support of the client v2
     ]]></description>
 
     <change-notes><![CDATA[
+      Version 3.5.2<br/>
+      <em>- Maintenance release with deprecation warning</em><br/>
       Version 3.5.1<br/>
       <em>- List more than 25 projects and locales</em><br/>
       Version 3.4<br/>
