@@ -1,6 +1,7 @@
 package com.phrase.intellij;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.phrase.intellij.ui.ColorTextPane;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ public class ProjectLocalesUploader {
         this.project = project;
         this.remoteProjectId = remoteProjectId;
         this.remoteLocaleNames = getRemoteLocaleNames(api);
-        this.localLocales = ProjectHelper.findProjectLocales(project.getBaseDir());
+        this.localLocales = ProjectHelper.findProjectLocales(ProjectUtil.guessProjectDir(project));
 
     }
 
