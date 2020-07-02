@@ -5,12 +5,10 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessListener;
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.phrase.intellij.ui.ColorTextPane;
@@ -65,7 +63,9 @@ public class PushPullAdapter {
                     clientAction);
             gcl.withWorkDirectory(projectPath);
 
-            PluginId pluginId = com.intellij.ide.plugins.PluginManager.getPluginByClassName(getClass().getName());
+            Map env = new HashMap<String, String>();
+            env.put("PHRASE_USER_AGENT", "AndroidStudio");
+            gcl.withEnvironment(env);
 
             final CapturingProcessHandler processHandler = new CapturingProcessHandler(gcl.createProcess(), Charset.defaultCharset(), gcl.getCommandLineString());
             processHandler.addProcessListener(new ProcessListener() {
