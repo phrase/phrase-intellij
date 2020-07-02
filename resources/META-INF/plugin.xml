@@ -1,7 +1,7 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>com.phraseapp.androidstudio</id>
     <name>PhraseApp</name>
-    <version>3.5.1</version>
+    <version>3.5.2</version>
     <vendor email="support@phrase.com" url="https://www.phrase.com">Phrase</vendor>
 
     <description><![CDATA[
