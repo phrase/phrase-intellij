@@ -4,7 +4,7 @@ import com.intellij.notification.*
 import com.intellij.openapi.project.Project
 import javax.swing.event.HyperlinkEvent
 
-private val NOTIFICATION_GROUP = NotificationGroup("Phrase", NotificationDisplayType.BALLOON, true)
+private val NOTIFICATION_GROUP = NotificationGroup.balloonGroup("Phrase")
 
 object Notify {
     fun error(content: String, project: Project? = null, onLinkEvent:((HyperlinkEvent)->Unit)? = null) {

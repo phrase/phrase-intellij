@@ -25,7 +25,7 @@ enum class PhraseButton(val title:String, val desc:String, val icon:String) {
     HELP(PhraseBundle.message("buttonHelp"), PhraseBundle.message("buttonHelpDesc"), "/icons/question.png");
 }
 
-abstract class PhraseAction(button: PhraseButton):AnAction(button.title, button.desc, IconLoader.getIcon(button.icon)){
+abstract class PhraseAction(button: PhraseButton):AnAction(button.title, button.desc, IconLoader.getIcon(button.icon, PhraseAction::class.java)){
     final override fun actionPerformed(e: AnActionEvent) {
         e.project?.let { act(it) }
     }

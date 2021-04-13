@@ -115,6 +115,11 @@ class Api(private val project: Project, private val accessToken:String) {
 //                }
                 apiCallback.onMessage(event.text)
             }
+
+            override fun processWillTerminate(event: ProcessEvent, willBeDestroyed: Boolean) {
+                //super.processWillTerminate(event, willBeDestroyed)
+            }
+
             override fun processTerminated(event: ProcessEvent) {
                 apiCallback.onFinish()
             }
