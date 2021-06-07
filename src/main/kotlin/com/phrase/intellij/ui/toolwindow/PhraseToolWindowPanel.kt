@@ -28,7 +28,9 @@ class PhraseToolWindowPanel: SimpleToolWindowPanel(true, true){
         textArea.text = ""
     }
 
-    fun append(message: String){
+    fun append(messageRaw: String){
+        val message = messageRaw.replace("\u001B\\[[;\\d]*m".toRegex(), "") //removes ANSI escape codes
+
         val color = when{
             message.startsWith("Error") -> Color.red
             else -> JBColor.foreground()
