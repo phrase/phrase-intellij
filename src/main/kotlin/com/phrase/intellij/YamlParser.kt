@@ -1,5 +1,6 @@
 package com.phrase.intellij
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -9,7 +10,11 @@ import com.intellij.openapi.vfs.VirtualFile
 import java.io.File
 
 object YamlParser {
-    private val yamlMapper by lazy { ObjectMapper(YAMLFactory()).registerKotlinModule() }
+    private val yamlMapper by lazy {
+        ObjectMapper(YAMLFactory())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .registerKotlinModule()
+    }
 
     private fun yamlFile(project: Project):File = File("${project.guessProjectDir()?.path}/.phrase.yml")
     fun yamlVirtualFile(project:Project): VirtualFile? = project.guessProjectDir()?.findChild(".phrase.yml")
