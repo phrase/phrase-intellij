@@ -40,3 +40,6 @@ Both are accessible from the menubar (under *Tools -> Phrase*) and the tool wind
 
 Valid locale files (named `strings.xml`) can be manually uploaded from the respective context menu in the project view.
 
+## Get help / support
+
+Please contact [support@phrase.com](mailto:support@phrase.com?subject=[GitHub]%20) and we can take more direct action toward finding a solution.
