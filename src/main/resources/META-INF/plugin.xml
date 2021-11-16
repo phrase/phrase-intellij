@@ -5,6 +5,8 @@
     <description><![CDATA[Phrase helps you manage Translations in your Android Studio projects. The plugin only supports <a href="https://github.com/phrase/phrase-cli">CLI v2</a>]]></description>
 
     <change-notes><![CDATA[
+      Version 5.1.0<br/>
+      <em>- Bug fixes and performance improvements</em><br/>
       Version 5.0.1<br/>
       <em>- Bug fixes and performance improvements</em><br/>
       Version 5.0.0<br/>
