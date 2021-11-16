@@ -7,6 +7,7 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.IconLoader
+import com.intellij.openapi.util.NlsActions
 import com.intellij.openapi.wm.ToolWindowManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -58,6 +59,12 @@ class ActionTranslationCenter: PhraseAction(PhraseButton.TRANSLATION_CENTER) {
 class ActionHelp: PhraseAction(PhraseButton.HELP) {
     override fun act(project: Project) = Utils.openLink(PhraseUrls.HELP, project)
 }
+class ActionOpenSettings : AnAction(PhraseBundle.message("actionOpenSettings")) {
+    override fun actionPerformed(p0: AnActionEvent) {
+        Utils.openConfigurable()
+    }
+}
+
 
 private fun onConfig(project: Project){
     try {
@@ -102,11 +109,7 @@ private fun onPushPull(command:Api.Command, project: Project, panel: PhraseToolW
 
 private fun showErrorNotification(e:Throwable, project: Project){
     when(e) {
-        is PhraseClientNotFoundException -> {
-            Notify.error(PhraseBundle.message("errorClientNotSpecified"), project) {
-                Utils.openConfigurable()
-            }
-        }
+        is PhraseClientNotFoundException -> Notify.error(PhraseBundle.message("errorClientNotSpecified"), project, ActionOpenSettings())
         is PhraseConfigurationNotFoundException -> Notify.error(PhraseBundle.message("errorConfigurationNotFound"), project)
         is PhraseLoadConfigurationException -> Notify.error(PhraseBundle.message("errorParsingConfiguration"), project)
         is PhraseSaveConfigurationException -> Notify.error(PhraseBundle.message("errorSavingConfiguration"), project)

@@ -73,6 +73,8 @@
             <add-to-group group-id="PhraseToolGroup"/>
         </action>
 
+        <action id="com.phrase.intellij.PhraseOpenSettings" class="com.phrase.intellij.ActionOpenSettings"/>
+
     </actions>
 
 </idea-plugin>
