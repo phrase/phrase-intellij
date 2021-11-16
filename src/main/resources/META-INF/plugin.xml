@@ -43,6 +43,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable groupId="tools" instance="com.phrase.intellij.ui.configurable.PhraseConfigurable"/>
         <toolWindow id="Phrase" anchor="right" icon="/icons/phrase.png" factoryClass="com.phrase.intellij.ui.toolwindow.PhraseToolWindow"/>
+        <notificationGroup id="Phrase Notifications" displayType="BALLOON" key="notification.group.phrase"/>
     </extensions>
 
     <actions>
