@@ -1,18 +1,19 @@
 package com.phrase.intellij
 
-import com.intellij.notification.*
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.project.Project
-import javax.swing.event.HyperlinkEvent
-
-private val NOTIFICATION_GROUP = NotificationGroup.balloonGroup("Phrase")
 
 object Notify {
-    fun error(content: String, project: Project? = null, onLinkEvent:((HyperlinkEvent)->Unit)? = null) {
-        val notification = NOTIFICATION_GROUP.createNotification("Phrase", content, NotificationType.ERROR, object:NotificationListener.Adapter() {
-            override fun hyperlinkActivated(notification: Notification, e: HyperlinkEvent) {
-                onLinkEvent?.invoke(e)
-            }
-        })
-        notification.notify(project)
+    fun error(content: String, project: Project? = null, action: AnAction? = null) {
+        val notification = Notification(
+            "Phrase Notifications",
+            content,
+            NotificationType.ERROR
+        )
+        if(action!=null) notification.addAction(action)
+        Notifications.Bus.notify(notification, project)
     }
 }

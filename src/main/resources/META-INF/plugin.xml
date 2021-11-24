@@ -5,6 +5,8 @@
     <description><![CDATA[Phrase helps you manage Translations in your Android Studio projects. The plugin only supports <a href="https://github.com/phrase/phrase-cli">CLI v2</a>]]></description>
 
     <change-notes><![CDATA[
+      Version 5.1.0<br/>
+      <em>- Bug fixes and performance improvements</em><br/>
       Version 5.0.1<br/>
       <em>- Bug fixes and performance improvements</em><br/>
       Version 5.0.0<br/>
@@ -43,6 +45,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable groupId="tools" instance="com.phrase.intellij.ui.configurable.PhraseConfigurable"/>
         <toolWindow id="Phrase" anchor="right" icon="/icons/phrase.png" factoryClass="com.phrase.intellij.ui.toolwindow.PhraseToolWindow"/>
+        <notificationGroup id="Phrase Notifications" displayType="BALLOON" key="notification.group.phrase"/>
     </extensions>
 
     <actions>
@@ -71,6 +74,8 @@
         <action id="com.phrase.intellij.PhraseHelp" class="com.phrase.intellij.ActionHelp">
             <add-to-group group-id="PhraseToolGroup"/>
         </action>
+
+        <action id="com.phrase.intellij.PhraseOpenSettings" class="com.phrase.intellij.ActionOpenSettings"/>
 
     </actions>
 
